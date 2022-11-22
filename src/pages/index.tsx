@@ -6,8 +6,7 @@ import { trpc } from "~/utils/trpc";
 import { DifficultyBar } from "~/components/DifficultyBar";
 
 export default function Home() {
-  const { data: courses } = trpc.useQuery(["course.getAll"]);
-  console.log(courses);
+  const { data: trailes } = trpc.useQuery(["trail.getAll"]);
 
   return (
     <>
@@ -18,40 +17,41 @@ export default function Home() {
       </Head>
       <div className="mx-auto flex h-screen max-w-2xl flex-col items-center py-24 px-8 text-zinc-600">
         <ul className="mt-4 w-full">
-          {courses?.map((course) => (
+          {trailes?.map((trail) => (
             <li
-              key={course.id}
+              key={trail.id}
               className="w-full border-t border-gray-200 text-gray-400 first:border-none"
             >
               <Link
-                href="/courses"
+                href="/quizzes/[slug]"
+                as={`quizzes/${trail.slug}`}
                 className="flex w-full items-center justify-start gap-4 py-4 px-2 transition-all hover:opacity-80 focus:opacity-80"
               >
                 <>
                   <img
                     className="w-12"
-                    src={course.imageUrl}
+                    src={trail.imageUrl}
                     alt="Image course"
                   />
 
-                  <div className="">
+                  <div className="w-full max-w-[296px]">
                     <span className="text-lg font-semibold text-gray-800">
-                      {course.title}
+                      {trail.title}
                     </span>
                     <div
                       className="text-sm leading-4"
-                      dangerouslySetInnerHTML={{ __html: course.description }}
+                      dangerouslySetInnerHTML={{ __html: trail.description }}
                     />
                   </div>
 
-                  <span className="flex w-36 justify-center text-sm">
+                  <span className="flex w-24 justify-start text-sm">
                     {Intl.NumberFormat("pt-BR", {
                       currency: "BRL",
                       style: "currency",
-                    }).format(course?.price || 0)}
+                    }).format(trail?.price || 0)}
                   </span>
 
-                  <DifficultyBar difficulty="beginner" />
+                  <DifficultyBar difficulty={trail.difficulty} />
                 </>
               </Link>
             </li>

@@ -16,7 +16,7 @@ export default function Quiz() {
 
   const { data } = trpc.useQuery(["quiz.get", { slug }]);
   const quiz = data!;
-  const { data: t } = trpc.useQuery(["course.getCourse", { slug }]);
+  const { data: t } = trpc.useQuery(["trail.getTrailer", { slug }]);
 
   const { mutateAsync: startSubmission, isLoading: isStartingSubmission } =
     trpc.useMutation(["submission.start"], {
@@ -73,6 +73,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const slug = params?.slug as string;
 
   await trpcSSG.prefetchQuery("quiz.getAll");
+  await trpcSSG.prefetchQuery("quiz.get", { slug });
 
   return {
     props: {

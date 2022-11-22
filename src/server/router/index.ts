@@ -1,14 +1,14 @@
 import superjson from "superjson";
 
 import { createRouter } from "./context";
-import { courseRouter } from "./course";
+import { trailRouter } from "./trail";
 import { quizRouter } from "./quiz";
 import { resultRouter } from "./result";
 import { submissionRouter } from "./submission";
 
 export const appRouter = createRouter()
   .transformer(superjson)
-  .merge("course.", courseRouter)
+  .merge("trail.", trailRouter)
   .merge("quiz.", quizRouter)
   .merge("submission.", submissionRouter)
   .merge("submission.", resultRouter);

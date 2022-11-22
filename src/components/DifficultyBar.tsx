@@ -1,6 +1,8 @@
+import type { CourseLevel } from "@prisma/client";
+
 interface DifficultyBarProps {
   size?: number;
-  difficulty: "beginner" | "middle" | "advanced";
+  difficulty: CourseLevel;
 }
 
 export function DifficultyBar({ difficulty }: DifficultyBarProps) {
@@ -10,18 +12,22 @@ export function DifficultyBar({ difficulty }: DifficultyBarProps) {
         <span className="block h-2 w-1 rounded-sm bg-indigo-600" />
         <span
           className={`block h-3 w-1 rounded-sm ${
-            difficulty === "beginner" || difficulty === "advanced"
+            difficulty === "MIDDLE" || difficulty === "ADVANCED"
               ? "bg-indigo-600"
               : "bg-gray-200"
           }`}
         />
         <span
           className={`block h-4 w-1 rounded-sm ${
-            difficulty === "advanced" ? "bg-indigo-600" : "bg-gray-200"
+            difficulty === "ADVANCED" ? "bg-indigo-600" : "bg-gray-200"
           }`}
         />
       </div>
-      <p>{difficulty}</p>
+      <p>
+        {difficulty === "BEGINNER" && "Fácil"}
+        {difficulty === "MIDDLE" && "Médio"}
+        {difficulty === "ADVANCED" && "Avançado"}
+      </p>
     </div>
   );
 }

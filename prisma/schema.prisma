@@ -32,7 +32,7 @@ model Question {
   @@map("questions")
 }
 
-model Course {
+model Trail {
   id          String      @id @default(cuid())
   title       String      @db.Text
   description String      @db.Text
@@ -55,8 +55,8 @@ model Quiz {
   questions   Question[]
   submissions Submission[]
 
-  courseId String?
-  course   Course? @relation(fields: [courseId], references: [id])
+  trailId String?
+  trail   Trail?  @relation(fields: [trailId], references: [id])
 }
 
 model Answer {
