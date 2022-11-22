@@ -1,11 +1,9 @@
 import Head from "next/head";
-import * as Dialog from "@radix-ui/react-dialog";
+import Link from "next/link";
 
-import { signIn } from "next-auth/react";
-import { Button } from "~/components/Form/Button";
-import { Fingerprint, GithubLogo } from "phosphor-react";
 import type { GetServerSideProps } from "next";
 import { trpc } from "~/utils/trpc";
+import { DifficultyBar } from "~/components/DifficultyBar";
 
 export default function Home() {
   const { data: courses } = trpc.useQuery(["course.getAll"]);
@@ -19,7 +17,83 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="mx-auto flex h-screen max-w-2xl flex-col items-center py-24 px-8 text-zinc-600">
-        <Dialog.Root>
+        <ul className="mt-4 w-full">
+          {courses?.map((course) => (
+            <li
+              key={course.id}
+              className="w-full border-t border-gray-200 text-gray-400 first:border-none"
+            >
+              <Link
+                href="/courses"
+                className="flex w-full items-center justify-start gap-4 py-4 px-2 transition-all hover:opacity-80 focus:opacity-80"
+              >
+                <>
+                  <img
+                    className="w-12"
+                    src={course.imageUrl}
+                    alt="Image course"
+                  />
+
+                  <div className="">
+                    <span className="text-lg font-semibold text-gray-800">
+                      {course.title}
+                    </span>
+                    <div
+                      className="text-sm leading-4"
+                      dangerouslySetInnerHTML={{ __html: course.description }}
+                    />
+                  </div>
+
+                  <span className="flex w-36 justify-center text-sm">
+                    {Intl.NumberFormat("pt-BR", {
+                      currency: "BRL",
+                      style: "currency",
+                    }).format(course?.price || 0)}
+                  </span>
+
+                  <DifficultyBar difficulty="beginner" />
+                </>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </>
+  );
+}
+
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+  return {
+    props: {},
+  };
+};
+
+// const AuthShowcase: React.FC = () => {
+//   const { data: sessionData } = useSession();
+
+//   const { data: secretMessage } = trpc.auth.getSecretMessage.useQuery(
+//     undefined, // no input
+//     { enabled: sessionData?.user !== undefined }
+//   );
+
+//   return (
+//     <div className="flex flex-col items-center justify-center gap-4">
+//       <p className="text-center text-2xl text-white">
+//         {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
+//         {secretMessage && <span> - {secretMessage}</span>}
+//       </p>
+//       <button
+//         className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
+//         onClick={sessionData ? () => signOut() : () => signIn()}
+//       >
+//         {sessionData ? "Sign out" : "Sign in"}
+//       </button>
+//     </div>
+//   );
+// };
+
+{
+  /* <Dialog.Root>
           <Dialog.Trigger asChild>
             <Button>Open modal</Button>
           </Dialog.Trigger>
@@ -70,65 +144,5 @@ export default function Home() {
               </Button>
             </div>
           </Dialog.Content>
-        </Dialog.Root>
-
-        <ul className="mt-4">
-          {courses?.map((course) => (
-            <li
-              key={course.id}
-              className="flex items-center gap-4 text-gray-400"
-            >
-              <img className="w-12" src={course.imageUrl} alt="Image course" />
-              <div>
-                <span className="text-lg font-semibold text-gray-800">
-                  {course.title}
-                </span>
-                <div
-                  className="max-w-sm text-sm leading-4"
-                  dangerouslySetInnerHTML={{ __html: course.description }}
-                />
-              </div>
-              <span className="text-sm">R$ 180,00</span>
-
-              <div className="flex items-end gap-[2px]">
-                <span className="h-2 w-1 bg-indigo-600 block rounded-sm" />
-                <span className="h-3 w-1 bg-gray-200 block rounded-sm" />
-                <span className="h-4 w-1 bg-gray-200 block rounded-sm" />
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </>
-  );
+        </Dialog.Root> */
 }
-
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  return {
-    props: {},
-  };
-};
-
-// const AuthShowcase: React.FC = () => {
-//   const { data: sessionData } = useSession();
-
-//   const { data: secretMessage } = trpc.auth.getSecretMessage.useQuery(
-//     undefined, // no input
-//     { enabled: sessionData?.user !== undefined }
-//   );
-
-//   return (
-//     <div className="flex flex-col items-center justify-center gap-4">
-//       <p className="text-center text-2xl text-white">
-//         {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
-//         {secretMessage && <span> - {secretMessage}</span>}
-//       </p>
-//       <button
-//         className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
-//         onClick={sessionData ? () => signOut() : () => signIn()}
-//       >
-//         {sessionData ? "Sign out" : "Sign in"}
-//       </button>
-//     </div>
-//   );
-// };

@@ -39,6 +39,7 @@ model Course {
   imageUrl    String
   slug        String      @unique
   difficulty  CourseLevel @default(BEGINNER)
+  price       Int
   createdAt   DateTime    @default(now())
 
   quizzes Quiz[]
