@@ -51,17 +51,24 @@ export default function Quiz() {
     await fetchAnotherQuestion();
   }
 
-  // const onCountdownFinish = useCallback(() => {
-  //   queryClient.setQueryData<inferQueryOutput<"submission.fetchQuestion">>(
-  //     ["submission.fetchQuestion", { submissionId }],
-  //     (data) => {
-  //       return {
-  //         ...data,
-  //         status: "late",
-  //       };
-  //     }
-  //   );
-  // }, [submissionId, queryClient]);
+  const onCountdownFinish = useCallback(() => {
+    queryClient.setQueryData<
+      inferQueryOutput<"submissionSession.fetchQuestion">
+    >(["submission.fetchQuestion", { submissionId }], (data) => {
+      return {
+        ...data,
+        status: "late",
+      };
+    });
+  }, [submissionId, queryClient]);
+
+  if (question?.status === "finished") {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center gap-2 text-lg text-zinc-500">
+        <Button>Quiz já finalizado!</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen bg-gray-100">
@@ -76,20 +83,24 @@ export default function Quiz() {
 
           <div aria-hidden="true">
             <div className="overflow-hidden rounded-sm bg-zinc-300">
-              <div
-                className="h-2 bg-indigo-500"
-                style={{
-                  width: `${
-                    ((question?.currentQuestionNumber ?? 0) * 100) / 20
-                  }%`,
-                }}
-              />
+              {question?.quantityQuestions !== undefined && (
+                <div
+                  className="h-2 bg-indigo-500"
+                  style={{
+                    width: `${
+                      ((question?.currentQuestionNumber ?? 0) * 100) /
+                      question.quantityQuestions
+                    }%`,
+                  }}
+                />
+              )}
             </div>
           </div>
 
           <div className="flex items-center justify-between">
             <p className="text-md p-3 font-medium">
-              Questão 3 de 20
+              Questão {question?.currentQuestionNumber} de
+              {question?.quantityQuestions}
               <span
                 className="hidden text-gray-400 sm:mx-1 sm:inline"
                 aria-hidden="true"
@@ -105,7 +116,7 @@ export default function Quiz() {
                   <Countdown
                     id={question.submissionQuestionAnswerId}
                     remainingTimeInSeconds={question.remainingTimeInSeconds}
-                    onCountdownFinish={() => 120}
+                    onCountdownFinish={onCountdownFinish}
                   />
                 )}
             </div>
@@ -161,9 +172,16 @@ export default function Quiz() {
             </RadioGroup.Root>
 
             <div className="mt-6 grid grid-cols-2 gap-2 md:flex md:flex-row md:justify-end">
-              <Button variant="outlined">Desistir</Button>
+              <Button className="w-56" variant="outlined">
+                Desistir
+              </Button>
 
-              <Button type="submit" isLoading={isSendingAnswer}>
+              <Button
+                className="w-56"
+                type="submit"
+                isLoading={isSendingAnswer}
+                disabled={!questionAnswerId}
+              >
                 Confirmar resposta
               </Button>
             </div>

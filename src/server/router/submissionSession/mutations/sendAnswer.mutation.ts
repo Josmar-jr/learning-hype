@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import { addMinutes, isAfter } from "date-fns";
 
 import type {
   ICustomCtx,
@@ -28,7 +29,30 @@ export async function sendAnswerMutation(
     });
   }
 
+  if (submissionQuestionAnswer.answerId) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "This question was already answered.",
+    });
+  }
+
   // TODO: Check date is still valid.
+  const answerDeadline = addMinutes(submissionQuestionAnswer.createdAt, 2);
+  const isAnswerLate = isAfter(new Date(), answerDeadline);
+
+  if (isAnswerLate) {
+    await ctx.prisma.submissionQuestionAnswer.update({
+      where: {
+        id: submissionQuestionAnswer.id,
+      },
+      data: {
+        answerId: null,
+        answeredAt: new Date(),
+        answered: true,
+      },
+    });
+  }
+
   // const answerDeadLine = new
 
   await ctx.prisma.submissionQuestionAnswer.update({
@@ -37,6 +61,8 @@ export async function sendAnswerMutation(
     },
     data: {
       answerId: input.answerId,
+      answeredAt: new Date(),
+      answered: true,
     },
   });
 }

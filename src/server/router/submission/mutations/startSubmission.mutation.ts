@@ -10,7 +10,7 @@ interface IParams {
     quizId: string;
   }>;
   ctx: ICustomCtx<{
-    session?: Session;
+    session?: Session | null;
   }>;
 }
 

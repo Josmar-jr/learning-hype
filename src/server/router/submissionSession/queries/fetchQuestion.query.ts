@@ -1,6 +1,10 @@
 import { TRPCError } from "@trpc/server";
 import { addMinutes, differenceInSeconds, isAfter } from "date-fns";
-import type { ICustomCtx, IContextWithMiddlewareParams, IInputParams } from "~/types/router-params";
+import type {
+  ICustomCtx,
+  IContextWithMiddlewareParams,
+  IInputParams,
+} from "~/types/router-params";
 
 export async function fetchQuestionQuery(
   ctx: IContextWithMiddlewareParams,
@@ -8,40 +12,38 @@ export async function fetchQuestionQuery(
     submissionId: string;
   }>
 ) {
-  const submission = await ctx.prisma.submission.findUnique({
+  const questionAnswers = await ctx.prisma.submissionQuestionAnswer.findMany({
     where: {
-      id: input.submissionId,
-    },
-    include: {
-      questionAnswers: true,
+      submissionId: input.submissionId,
     },
   });
 
-  if (!submission) {
-    throw new TRPCError({
-      code: "BAD_REQUEST",
-      message: "The submission with the provided ID was not found.",
-    });
-  }
+  const quantityQuestions = await ctx.prisma.submission.findUnique({
+    where: {
+      id: input.submissionId,
+    },
+    select: {
+      quiz: {
+        select: {
+          _count: {
+            select: {
+              questions: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
-  // Get the submission status (what questions are already answered?)
-  // Fetch the first non-answered question (if there is one)
-  // Otherwise, fetch a random question that's not answered yet
-  // Create a submission question answer with empty answer
+  const alreadyFetchedQuestionIds = questionAnswers.map((question) => {
+    return question.questionId;
+  });
 
-  const alreadyFetchedQuestionIds = submission.questionAnswers.map(
-    (question) => {
-      return question.questionId;
-    }
-  );
+  const inProgressQuestion = questionAnswers.find((questionAnswer) => {
+    return questionAnswer.answered === false;
+  });
 
-  const inProgressQuestion = submission.questionAnswers.find(
-    (questionAnswer) => {
-      return questionAnswer.answerId === null;
-    }
-  );
-
-  const currentQuestionNumber = alreadyFetchedQuestionIds.length || 1;
+  const currentQuestionNumber = alreadyFetchedQuestionIds.length;
 
   if (inProgressQuestion) {
     const currentQuestion = await ctx.prisma.question.findUnique({
@@ -60,6 +62,7 @@ export async function fetchQuestionQuery(
       return {
         status: "late",
         currentQuestionNumber,
+        quantityQuestions: quantityQuestions?.quiz._count.questions,
         remainingTimeInSeconds: 0,
         description: currentQuestion?.description,
         submissionQuestionAnswerId: inProgressQuestion.id,
@@ -75,6 +78,7 @@ export async function fetchQuestionQuery(
     return {
       status: "ongoing",
       currentQuestionNumber,
+      quantityQuestions: quantityQuestions?.quiz._count.questions,
       remainingTimeInSeconds: differenceInSeconds(
         addMinutes(inProgressQuestion.createdAt, 2),
         new Date()
@@ -88,42 +92,85 @@ export async function fetchQuestionQuery(
         };
       }),
     };
-  }
-
-  const nextQuestion = await ctx.prisma.question.findFirst({
-    where: {
-      quizId: submission.quizId,
-      id: {
-        notIn: alreadyFetchedQuestionIds,
+  } else {
+    const nextQuestion = await ctx.prisma.question.findFirst({
+      where: {
+        quizId: ctx.submission.quizId,
+        id: {
+          notIn: alreadyFetchedQuestionIds,
+        },
       },
-    },
-    include: {
-      answers: true,
-    },
-  });
-
-  if (!nextQuestion) {
-    return {
-      status: "finished",
-    };
-  }
-
-  const submissionQuestionAnswer =
-    await ctx.prisma.submissionQuestionAnswer.create({
-      data: {
-        submissionId: submission.id,
-        questionId: nextQuestion.id,
+      include: {
+        answers: true,
       },
     });
 
-  const answerDeadline = addMinutes(submissionQuestionAnswer.createdAt, 2);
-  const isAnswerLate = isAfter(new Date(), answerDeadline);
+    if (!nextQuestion) {
+      await ctx.prisma.submission.update({
+        where: {
+          id: input.submissionId,
+        },
+        data: {
+          finishedAt: new Date(),
+        },
+      });
 
-  if (isAnswerLate) {
+      if (ctx.userId) {
+        const [user, quiz] = await Promise.all([
+          ctx.prisma.user.findUnique({
+            where: {
+              id: ctx.userId,
+            },
+          }),
+          ctx.prisma.quiz.findUnique({
+            where: {
+              id: ctx.submission.quizId,
+            },
+          }),
+        ]);
+      }
+
+      return {
+        status: "finished",
+      };
+    }
+
+    const submissionQuestionAnswer =
+      await ctx.prisma.submissionQuestionAnswer.create({
+        data: {
+          submissionId: input.submissionId,
+          questionId: nextQuestion.id,
+        },
+      });
+
+    const answerDeadline = addMinutes(submissionQuestionAnswer.createdAt, 2);
+    const isAnswerLate = isAfter(new Date(), answerDeadline);
+
+    if (isAnswerLate) {
+      return {
+        status: "late",
+        currentQuestionNumber,
+        quantityQuestions: quantityQuestions?.quiz._count.questions,
+        remainingTimeInSeconds: 0,
+        description: nextQuestion?.description,
+        submissionQuestionAnswerId: submissionQuestionAnswer.id,
+        answers: nextQuestion?.answers.map((answer) => {
+          return {
+            id: answer.id,
+            description: answer.description,
+          };
+        }),
+      };
+    }
+
     return {
-      status: "late",
-      currentQuestionNumber,
-      remainingTimeInSeconds: 0,
+      status: "ongoing",
+      currentQuestionNumber: currentQuestionNumber + 1,
+      quantityQuestions: quantityQuestions?.quiz._count.questions,
+      remainingTimeInSeconds: differenceInSeconds(
+        addMinutes(submissionQuestionAnswer.createdAt, 2),
+        new Date()
+      ),
       description: nextQuestion?.description,
       submissionQuestionAnswerId: submissionQuestionAnswer.id,
       answers: nextQuestion?.answers.map((answer) => {
@@ -134,21 +181,4 @@ export async function fetchQuestionQuery(
       }),
     };
   }
-
-  return {
-    status: "ongoing",
-    currentQuestionNumber: currentQuestionNumber + 1,
-    remainingTimeInSeconds: differenceInSeconds(
-      addMinutes(submissionQuestionAnswer.createdAt, 2),
-      new Date()
-    ),
-    description: nextQuestion?.description,
-    submissionQuestionAnswerId: submissionQuestionAnswer.id,
-    answers: nextQuestion?.answers.map((answer) => {
-      return {
-        id: answer.id,
-        description: answer.description,
-      };
-    }),
-  };
 }

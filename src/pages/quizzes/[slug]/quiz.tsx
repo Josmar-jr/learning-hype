@@ -9,7 +9,6 @@ import Image from "next/image";
 
 import hypetiguerLogoImg from "~/assets/logo.svg";
 import { Button } from "~/components/Form/Button";
-import { signIn } from "next-auth/react";
 
 export default function Quiz() {
   const router = useRouter();
@@ -19,27 +18,18 @@ export default function Quiz() {
   const quiz = data!;
   const { data: t } = trpc.useQuery(["trail.getTrailer", { slug }]);
 
-  const {
-    mutateAsync: startSubmission,
-    isLoading: isStartingSubmission,
-    isError,
-  } = trpc.useMutation(["submission.start"], {
-    async onSuccess(data) {
-      await router.push(`/submissions/${data.submissionId}`);
-    },
-    async onError() {
-      await router.push(`/`);
-    },
-  });
-
-  if (isError) {
-    return "oi";
-  }
+  const { mutateAsync: startSubmission, isLoading: isStartingSubmission } =
+    trpc.useMutation(["submission.start"], {
+      async onSuccess(data) {
+        await router.push(`/submissions/${data.submissionId}`);
+      },
+      async onError() {
+        await router.push(`/`);
+      },
+    });
 
   return (
     <div className="mx-auto flex h-screen max-w-2xl flex-col items-center py-24 px-8 text-zinc-100">
-      <Button onClick={() => signIn("github")}>OI</Button>
-
       <Image src={hypetiguerLogoImg} alt="" width={200} />
 
       <img className="mt-16 w-36" src="/logo-react.svg" alt="logo" />
@@ -65,7 +55,7 @@ export default function Quiz() {
       </p>
 
       <Button
-        className="mt-8"
+        className="mt-8 w-56"
         onClick={() => startSubmission({ quizId: quiz.id })}
         isLoading={isStartingSubmission}
       >

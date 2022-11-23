@@ -23,8 +23,8 @@ module.exports = {
     colors: {
       gray: {
         100: "#F7F7F8",
-        200: "#DBDCDD",
-        300: "#A8A8B3",
+        200: "#EFEFF1",
+        300: "#EBEBEB",
         400: "#7E7E86",
         800: "#29292E",
         900: "#0E0E10",
@@ -32,6 +32,9 @@ module.exports = {
       white: colors.white,
       indigo: colors.indigo,
       zinc: colors.zinc,
+      emerald: colors.emerald,
+      amber: colors.amber,
+      red: colors.red,
     },
   },
   plugins: [],
