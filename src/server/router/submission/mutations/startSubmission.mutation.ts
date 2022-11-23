@@ -1,18 +1,28 @@
 /* eslint-disable prefer-const */
 import { randomUUID } from "crypto";
+import type { Session } from "next-auth";
 import { parseCookies, setCookie } from "nookies";
 
-import type { IContextParams, IInputParams } from "~/types/router-params";
+import type { ICustomCtx, IInputParams } from "~/types/router-params";
 
-export async function startSubmissionMutation(
+interface IParams {
   input: IInputParams<{
     quizId: string;
-  }>,
-  ctx: IContextParams
-): Promise<{
+  }>;
+  ctx: ICustomCtx<{
+    session?: Session;
+  }>;
+}
+
+export async function startSubmissionMutation({
+  ctx,
+  input,
+}: IParams): Promise<{
   submissionId: string;
 }> {
   let { sessionId = null, userId = null } = parseCookies({ req: ctx.req });
+
+  debugger;
 
   if (!sessionId && !userId) {
     sessionId = randomUUID();

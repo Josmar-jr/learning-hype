@@ -23,7 +23,7 @@ export default function Quiz() {
     data: question,
     isLoading: isLoadingQuestion,
     refetch: fetchAnotherQuestion,
-  } = trpc.useQuery(["submission.fetchQuestion", { submissionId }], {
+  } = trpc.useQuery(["submissionSession.fetchQuestion", { submissionId }], {
     onSuccess: (data) => {
       if (data.status === "finished") {
         setIsFinishingQuiz(true);
@@ -33,7 +33,7 @@ export default function Quiz() {
   });
 
   const { mutateAsync: sendAnswer, isLoading: isSendingAnswer } =
-    trpc.useMutation("submission.sendAnswer");
+    trpc.useMutation("submissionSession.sendAnswer");
 
   async function handleSendAnswer(event: FormEvent) {
     event.preventDefault();
@@ -45,6 +45,7 @@ export default function Quiz() {
     await sendAnswer({
       submissionQuestionAnswerId: question.submissionQuestionAnswerId,
       answerId: questionAnswerId,
+      submissionId,
     });
 
     await fetchAnotherQuestion();
@@ -176,8 +177,8 @@ export default function Quiz() {
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const submissionId = params?.id as string;
 
-  await trpcSSG.prefetchQuery("submission.get", { submissionId });
-  const oi = await trpcSSG.prefetchQuery("submission.fetchQuestion", {
+  await trpcSSG.prefetchQuery("submissionSession.get", { submissionId });
+  const oi = await trpcSSG.prefetchQuery("submissionSession.fetchQuestion", {
     submissionId,
   });
 

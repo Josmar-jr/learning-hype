@@ -1,12 +1,17 @@
 import { TRPCError } from "@trpc/server";
 
-import type { IContextParams, IInputParams } from "~/types/router-params";
+import type {
+  ICustomCtx,
+  IContextWithMiddlewareParams,
+  IInputParams,
+} from "~/types/router-params";
 
 export async function sendAnswerMutation(
-  ctx: IContextParams,
+  ctx: IContextWithMiddlewareParams,
   input: IInputParams<{
+    answerId?: string | null | undefined;
+    submissionId: string;
     submissionQuestionAnswerId: string;
-    answerId: string;
   }>
 ) {
   const submissionQuestionAnswer =
@@ -24,7 +29,7 @@ export async function sendAnswerMutation(
   }
 
   // TODO: Check date is still valid.
-  // const answerDeadLine = new 
+  // const answerDeadLine = new
 
   await ctx.prisma.submissionQuestionAnswer.update({
     where: {

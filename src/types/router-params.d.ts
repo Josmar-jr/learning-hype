@@ -1,7 +1,7 @@
 import type { Prisma, PrismaClient, Submission } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-export type IContextParams = {
+export type ICustomCtx<T> = T & {
   prisma: PrismaClient<
     Prisma.PrismaClientOptions,
     never,

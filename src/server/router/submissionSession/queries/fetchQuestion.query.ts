@@ -1,9 +1,9 @@
 import { TRPCError } from "@trpc/server";
 import { addMinutes, differenceInSeconds, isAfter } from "date-fns";
-import type { IContextParams, IInputParams } from "~/types/router-params";
+import type { ICustomCtx, IContextWithMiddlewareParams, IInputParams } from "~/types/router-params";
 
 export async function fetchQuestionQuery(
-  ctx: IContextParams,
+  ctx: IContextWithMiddlewareParams,
   input: IInputParams<{
     submissionId: string;
   }>
