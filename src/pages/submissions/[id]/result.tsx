@@ -99,6 +99,7 @@ export default function Result() {
   const result = response.data!;
 
   const level = getLevelFromResult(result?.result);
+  
 
   return (
     <>

@@ -10,6 +10,7 @@ import { trpc } from "~/utils/trpc";
 import type { FormEvent } from "react";
 import { useState, useCallback } from "react";
 import { useQueryClient } from "react-query";
+import { RadioGroupAnswer } from "~/components/Form/RadioGroupAnswer";
 
 export default function Quiz() {
   const router = useRouter();
@@ -137,39 +138,19 @@ export default function Quiz() {
               ))
             )}
 
-            <RadioGroup.Root
-              className="mt-6 space-y-4"
-              onValueChange={setQuestionAnswerId}
-              value={questionAnswerId}
-            >
-              {isLoadingQuestion
-                ? [0, 1, 2, 3].map((item) => (
-                    <div className="w-full animate-pulse" key={item}>
-                      <div className="h-16 w-full rounded-md bg-gray-200"></div>
-                    </div>
-                  ))
-                : question?.answers?.map((answer) => (
-                    <RadioGroup.Item
-                      key={answer.id}
-                      value={answer.id}
-                      className="flex w-full items-center gap-2 rounded-md border border-gray-200 bg-gray-100 px-6 py-4 text-left 
-                transition-colors checked:border-indigo-500 hover:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 
-                focus:ring-offset-gray-100"
-                    >
-                      <div>
-                        <div className="h-6 w-6 rounded-full border-2 border-gray-200 bg-white">
-                          <RadioGroup.Indicator
-                            className="after:content[''] relative flex h-full w-full items-center
-                  justify-center rounded-full border-4 bg-indigo-500 after:absolute after:block after:h-[11px] after:w-[11px]"
-                          />
-                        </div>
-                      </div>
-                      <p className="leading-relaxed text-zinc-800">
-                        {answer.description}
-                      </p>
-                    </RadioGroup.Item>
-                  ))}
-            </RadioGroup.Root>
+            {isLoadingQuestion || !question?.answers ? (
+              [0, 1, 2, 3].map((item) => (
+                <div className="w-full animate-pulse" key={item}>
+                  <div className="h-16 w-full rounded-md bg-gray-200"></div>
+                </div>
+              ))
+            ) : (
+              <RadioGroupAnswer
+                onValueChange={setQuestionAnswerId}
+                value={questionAnswerId}
+                answerList={question?.answers}
+              />
+            )}
 
             <div className="mt-6 grid grid-cols-2 gap-2 md:flex md:flex-row md:justify-end">
               <Button className="w-56" variant="outlined">

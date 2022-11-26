@@ -118,9 +118,9 @@ export const submissionSessionRouter = createRouter()
             },
           },
         },
-      });
+      })
 
-      if (!submission?.reportViewedAt && submission?.user) {
+      if (!submission?.reportViewedAt) {
         await Promise.all([
           ctx.prisma.submission.update({
             where: {
@@ -148,8 +148,8 @@ export const submissionSessionRouter = createRouter()
           },
           userAnswer: questionAnswer.answer,
           rightAnswer: questionAnswer.question.answers[0],
-        };
-      });
+        }
+      })
 
       return {
         result: ctx.submission.result,
