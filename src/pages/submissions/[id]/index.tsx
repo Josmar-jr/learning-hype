@@ -10,6 +10,7 @@ import { trpc } from "~/utils/trpc";
 import type { FormEvent } from "react";
 import { useState, useCallback } from "react";
 import { useQueryClient } from "react-query";
+import { RadioGroupAnswer } from "~/components/Form/RadioGroupAnswer";
 
 export default function Quiz() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function Quiz() {
     data: question,
     isLoading: isLoadingQuestion,
     refetch: fetchAnotherQuestion,
-  } = trpc.useQuery(["submission.fetchQuestion", { submissionId }], {
+  } = trpc.useQuery(["submissionSession.fetchQuestion", { submissionId }], {
     onSuccess: (data) => {
       if (data.status === "finished") {
         setIsFinishingQuiz(true);
@@ -33,7 +34,7 @@ export default function Quiz() {
   });
 
   const { mutateAsync: sendAnswer, isLoading: isSendingAnswer } =
-    trpc.useMutation("submission.sendAnswer");
+    trpc.useMutation("submissionSession.sendAnswer");
 
   async function handleSendAnswer(event: FormEvent) {
     event.preventDefault();
@@ -45,22 +46,30 @@ export default function Quiz() {
     await sendAnswer({
       submissionQuestionAnswerId: question.submissionQuestionAnswerId,
       answerId: questionAnswerId,
+      submissionId,
     });
 
     await fetchAnotherQuestion();
   }
 
-  // const onCountdownFinish = useCallback(() => {
-  //   queryClient.setQueryData<inferQueryOutput<"submission.fetchQuestion">>(
-  //     ["submission.fetchQuestion", { submissionId }],
-  //     (data) => {
-  //       return {
-  //         ...data,
-  //         status: "late",
-  //       };
-  //     }
-  //   );
-  // }, [submissionId, queryClient]);
+  const onCountdownFinish = useCallback(() => {
+    queryClient.setQueryData<
+      inferQueryOutput<"submissionSession.fetchQuestion">
+    >(["submission.fetchQuestion", { submissionId }], (data) => {
+      return {
+        ...data,
+        status: "late",
+      };
+    });
+  }, [submissionId, queryClient]);
+
+  if (question?.status === "finished") {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center gap-2 text-lg text-zinc-500">
+        <Button>Quiz já finalizado!</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen bg-gray-100">
@@ -75,20 +84,24 @@ export default function Quiz() {
 
           <div aria-hidden="true">
             <div className="overflow-hidden rounded-sm bg-zinc-300">
-              <div
-                className="h-2 bg-indigo-500"
-                style={{
-                  width: `${
-                    ((question?.currentQuestionNumber ?? 0) * 100) / 20
-                  }%`,
-                }}
-              />
+              {question?.quantityQuestions !== undefined && (
+                <div
+                  className="h-2 bg-indigo-500"
+                  style={{
+                    width: `${
+                      ((question?.currentQuestionNumber ?? 0) * 100) /
+                      question.quantityQuestions
+                    }%`,
+                  }}
+                />
+              )}
             </div>
           </div>
 
           <div className="flex items-center justify-between">
             <p className="text-md p-3 font-medium">
-              Questão 3 de 20
+              Questão {question?.currentQuestionNumber} de
+              {question?.quantityQuestions}
               <span
                 className="hidden text-gray-400 sm:mx-1 sm:inline"
                 aria-hidden="true"
@@ -104,7 +117,7 @@ export default function Quiz() {
                   <Countdown
                     id={question.submissionQuestionAnswerId}
                     remainingTimeInSeconds={question.remainingTimeInSeconds}
-                    onCountdownFinish={() => 120}
+                    onCountdownFinish={onCountdownFinish}
                   />
                 )}
             </div>
@@ -125,44 +138,31 @@ export default function Quiz() {
               ))
             )}
 
-            <RadioGroup.Root
-              className="mt-6 space-y-4"
-              onValueChange={setQuestionAnswerId}
-              value={questionAnswerId}
-            >
-              {isLoadingQuestion
-                ? [0, 1, 2, 3].map((item) => (
-                    <div className="w-full animate-pulse" key={item}>
-                      <div className="h-16 w-full rounded-md bg-gray-200"></div>
-                    </div>
-                  ))
-                : question?.answers?.map((answer) => (
-                    <RadioGroup.Item
-                      key={answer.id}
-                      value={answer.id}
-                      className="flex w-full items-center gap-2 rounded-md border border-gray-200 bg-gray-100 px-6 py-4 text-left 
-                transition-colors checked:border-indigo-500 hover:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 
-                focus:ring-offset-gray-100"
-                    >
-                      <div>
-                        <div className="h-6 w-6 rounded-full border-2 border-gray-200 bg-white">
-                          <RadioGroup.Indicator
-                            className="after:content[''] relative flex h-full w-full items-center
-                  justify-center rounded-full border-4 bg-indigo-500 after:absolute after:block after:h-[11px] after:w-[11px]"
-                          />
-                        </div>
-                      </div>
-                      <p className="leading-relaxed text-zinc-800">
-                        {answer.description}
-                      </p>
-                    </RadioGroup.Item>
-                  ))}
-            </RadioGroup.Root>
+            {isLoadingQuestion || !question?.answers ? (
+              [0, 1, 2, 3].map((item) => (
+                <div className="w-full animate-pulse" key={item}>
+                  <div className="h-16 w-full rounded-md bg-gray-200"></div>
+                </div>
+              ))
+            ) : (
+              <RadioGroupAnswer
+                onValueChange={setQuestionAnswerId}
+                value={questionAnswerId}
+                answerList={question?.answers}
+              />
+            )}
 
             <div className="mt-6 grid grid-cols-2 gap-2 md:flex md:flex-row md:justify-end">
-              <Button variant="outlined">Desistir</Button>
+              <Button className="w-56" variant="outlined">
+                Desistir
+              </Button>
 
-              <Button type="submit" isLoading={isSendingAnswer}>
+              <Button
+                className="w-56"
+                type="submit"
+                isLoading={isSendingAnswer}
+                disabled={!questionAnswerId}
+              >
                 Confirmar resposta
               </Button>
             </div>
@@ -176,8 +176,8 @@ export default function Quiz() {
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const submissionId = params?.id as string;
 
-  await trpcSSG.prefetchQuery("submission.get", { submissionId });
-  const oi = await trpcSSG.prefetchQuery("submission.fetchQuestion", {
+  await trpcSSG.prefetchQuery("submissionSession.get", { submissionId });
+  const oi = await trpcSSG.prefetchQuery("submissionSession.fetchQuestion", {
     submissionId,
   });
 

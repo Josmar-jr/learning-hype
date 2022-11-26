@@ -23,6 +23,9 @@ export default function Quiz() {
       async onSuccess(data) {
         await router.push(`/submissions/${data.submissionId}`);
       },
+      async onError() {
+        await router.push(`/`);
+      },
     });
 
   return (
@@ -52,7 +55,7 @@ export default function Quiz() {
       </p>
 
       <Button
-        className="mt-8"
+        className="mt-8 w-56"
         onClick={() => startSubmission({ quizId: quiz.id })}
         isLoading={isStartingSubmission}
       >
