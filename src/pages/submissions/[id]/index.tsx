@@ -18,8 +18,13 @@ export default function Quiz() {
   const submissionId = String(router.query.id);
   const queryClient = useQueryClient();
 
-  const [questionAnswerId, setQuestionAnswerId] = useState<string>();
+  const [questionAnswerId, setQuestionAnswerId] = useState("");
   const [isFinishingQuiz, setIsFinishingQuiz] = useState(false);
+
+  const { data: submission } = trpc.useQuery([
+    "submissionSession.get",
+    { submissionId },
+  ]);
 
   const {
     data: question,
@@ -101,7 +106,9 @@ export default function Quiz() {
               >
                 &middot;
               </span>{" "}
-              <strong className="block sm:inline">Fundamentos React</strong>
+              <strong className="block sm:inline">
+                {submission?.quiz.title}
+              </strong>
             </p>
 
             <div className="text-md align-right p-3 font-medium">
@@ -124,7 +131,12 @@ export default function Quiz() {
               Questão {question?.currentQuestionNumber}
             </h2>
             {!isLoadingQuestion ? (
-              <p className="mt-4 text-lg leading-8">{question?.description}</p>
+              <p
+                className="mt-4 text-lg leading-8"
+                dangerouslySetInnerHTML={{
+                  __html: question?.description || "",
+                }}
+              />
             ) : (
               [0, 1, 2, 3, 4].map((item) => (
                 <div className="w-full animate-pulse" key={item}>
@@ -172,11 +184,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const submissionId = params?.id as string;
 
   await trpcSSG.prefetchQuery("submissionSession.get", { submissionId });
-  const oi = await trpcSSG.prefetchQuery("submissionSession.fetchQuestion", {
+  await trpcSSG.prefetchQuery("submissionSession.fetchQuestion", {
     submissionId,
   });
-
-  console.log(oi);
 
   return {
     props: {
@@ -184,22 +194,3 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     },
   };
 };
-
-// export const getStaticPaths: GetStaticPaths = async () => {
-//   return {
-//     paths: [],
-//     fallback: "blocking",
-//   };
-// };
-
-// export const getStaticProps: GetStaticProps = async ({ params }) => {
-//   const slug = params?.slug as string;
-
-//   await trpcSSG.prefetchQuery("question.getAll");
-
-//   return {
-//     props: {
-//       trpcState: trpcSSG.dehydrate(),
-//     },
-//   };
-// };
