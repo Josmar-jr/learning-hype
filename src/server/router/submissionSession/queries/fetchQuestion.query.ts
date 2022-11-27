@@ -1,7 +1,5 @@
-import { TRPCError } from "@trpc/server";
 import { addMinutes, differenceInSeconds, isAfter } from "date-fns";
 import type {
-  ICustomCtx,
   IContextWithMiddlewareParams,
   IInputParams,
 } from "~/types/router-params";
@@ -116,7 +114,7 @@ export async function fetchQuestionQuery(
       });
 
       if (ctx.userId) {
-        const [user, quiz] = await Promise.all([
+        await Promise.all([
           ctx.prisma.user.findUnique({
             where: {
               id: ctx.userId,

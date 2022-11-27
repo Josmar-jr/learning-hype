@@ -2,7 +2,6 @@ import { TRPCError } from "@trpc/server";
 import { addMinutes, isAfter } from "date-fns";
 
 import type {
-  ICustomCtx,
   IContextWithMiddlewareParams,
   IInputParams,
 } from "~/types/router-params";

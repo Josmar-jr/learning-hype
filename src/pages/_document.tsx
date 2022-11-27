@@ -1,6 +1,5 @@
 import { Head, Html, Main, NextScript } from "next/document";
 import Script from "next/script";
-import logo from "~/assets/logo.svg";
 
 export default function Document() {
   return (
@@ -17,6 +16,8 @@ export default function Document() {
           rel="stylesheet"
         />
 
+        <link rel="icon" href="/illustration.svg" />
+
         <Script
           id="active-campaign"
           dangerouslySetInnerHTML={{
@@ -29,7 +30,7 @@ export default function Document() {
           }}
         />
       </Head>
-      <body className="text-gray-900 bg-gray-100">
+      <body className="bg-gray-100 text-gray-900">
         <Main />
         <NextScript />
       </body>
