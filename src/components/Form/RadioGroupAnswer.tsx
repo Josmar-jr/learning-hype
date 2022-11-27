@@ -6,12 +6,10 @@ export type RadioGroupAnswerProps = ComponentProps<typeof RadioGroup.Root> & {
     id: string;
     description: string;
   }[];
-  isJig?: boolean;
 };
 
 export function RadioGroupAnswer({
   answerList,
-  isJig = false,
   ...rest
 }: RadioGroupAnswerProps) {
   return (
