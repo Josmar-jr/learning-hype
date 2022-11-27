@@ -2,6 +2,8 @@ import type { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
+import type { Variants } from "framer-motion";
+import { motion } from "framer-motion";
 
 import { Check, PenNib } from "phosphor-react";
 
@@ -10,6 +12,33 @@ import { trpc } from "~/utils/trpc";
 import { LevelBar } from "~/components/LevelBar";
 
 import hypetiguerLogoImg from "~/assets/logo.svg";
+
+const listVariants: Variants = {
+  hidden: { opacity: 0, y: 100 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      delayChildren: 0.5,
+      staggerChildren: 0.35,
+      type: "keyframes",
+    },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: {
+    y: -50,
+    opacity: 0,
+  },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      duration: 0.5,
+    },
+  },
+};
 
 export default function Home() {
   const { data: quizzes } = trpc.useQuery(["quiz.getAll"]);
@@ -22,7 +51,19 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="mx-auto flex h-screen max-w-2xl flex-col py-24 px-2 text-zinc-600 sm:px-8">
-        <div className="px-2 md:px-0">
+        <motion.div
+          initial={{
+            opacity: 0,
+          }}
+          animate={{
+            opacity: 1,
+          }}
+          transition={{
+            duration: 2,
+            ease: "easeOut",
+          }}
+          className="px-2 md:px-0"
+        >
           <Image src={hypetiguerLogoImg} alt="" width={160} />
 
           <h2 className="mt-6 text-xl font-medium">
@@ -32,14 +73,20 @@ export default function Home() {
           <p className="mt-1 text-sm text-zinc-400">
             Inicie escolhendo um dos testes da lista abaixo
           </p>
-        </div>
+        </motion.div>
 
         <div></div>
 
-        <ul className="mt-8 w-full">
+        <motion.ul
+          variants={listVariants}
+          initial="hidden"
+          animate="visible"
+          className="mt-8 w-full"
+        >
           {quizzes?.map((quiz) => (
-            <li
+            <motion.li
               key={quiz.id}
+              variants={itemVariants}
               className="w-full border-t border-zinc-200 text-gray-400 first:border-none"
             >
               <Link
@@ -59,7 +106,7 @@ export default function Home() {
                       {quiz.title}
                     </span>
                     <div
-                      className="leading-4 text-sm text-zinc-400"
+                      className="text-sm leading-4 text-zinc-400"
                       dangerouslySetInnerHTML={{ __html: quiz.description }}
                     />
                   </div>
@@ -83,9 +130,9 @@ export default function Home() {
                   </span>
                 </>
               </Link>
-            </li>
+            </motion.li>
           ))}
-        </ul>
+        </motion.ul>
       </main>
     </>
   );
@@ -96,82 +143,3 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     props: {},
   };
 };
-
-// const AuthShowcase: React.FC = () => {
-//   const { data: sessionData } = useSession();
-
-//   const { data: secretMessage } = trpc.auth.getSecretMessage.useQuery(
-//     undefined, // no input
-//     { enabled: sessionData?.user !== undefined }
-//   );
-
-//   return (
-//     <div className="flex flex-col items-center justify-center gap-4">
-//       <p className="text-center text-2xl text-white">
-//         {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
-//         {secretMessage && <span> - {secretMessage}</span>}
-//       </p>
-//       <button
-//         className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
-//         onClick={sessionData ? () => signOut() : () => signIn()}
-//       >
-//         {sessionData ? "Sign out" : "Sign in"}
-//       </button>
-//     </div>
-//   );
-// };
-
-{
-  /* <Dialog.Root>
-          <Dialog.Trigger asChild>
-            <Button>Open modal</Button>
-          </Dialog.Trigger>
-
-          <Dialog.Overlay className="fixed inset-0 bg-[#050206] opacity-70" />
-
-          <Dialog.Content className="fixed top-1/2 left-1/2 flex w-full max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-lg bg-gray-100 py-6 px-2 text-center">
-            <span className="mb-8 rounded-full bg-gray-200 p-4 text-gray-100">
-              <Fingerprint size={32} weight="bold" />
-            </span>
-
-            <Dialog.Title className="text-2xl font-bold">
-              Tempo esgotado!
-            </Dialog.Title>
-            <Dialog.Description className="text-zinc-400">
-              <p className="py-2 text-gray-800">
-                Crie sua conta <strong>gratuitamente</strong> na plataforma para
-                visualizar o relatório completo de testes e também:
-              </p>
-
-              <ul className="flex list-disc flex-col items-center text-left">
-                <li>Salvar as questões que respondeu</li>
-                <li>Ter um panorama geral de acertos e erros</li>
-                <li>Emitir relátorio em formato PDF</li>
-                <li>Receba feedbacks constantes para sua evolução</li>
-              </ul>
-
-              <p>
-                Aprenda mais sobre uma das <strong>maiores bibliotecas</strong>{" "}
-                e seu ecosistema, o React JS é construido para facilitar o
-                desenvolvimento web front end, tanto no web e no mobile.
-              </p>
-            </Dialog.Description>
-
-            <div className="flex gap-2">
-              <Dialog.Trigger asChild>
-                <Button className="mt-8 w-60" variant="outlined">
-                  Cancelar
-                </Button>
-              </Dialog.Trigger>
-              <Button
-                className="mt-8 w-60"
-                variant="secondary"
-                onClick={() => signIn("github")}
-              >
-                <GithubLogo className="h-5 w-5" />
-                Entrar com Github
-              </Button>
-            </div>
-          </Dialog.Content>
-        </Dialog.Root> */
-}

@@ -1,9 +1,7 @@
 import { useRouter } from "next/router";
+import { Check, Spinner, X } from "phosphor-react";
+
 import { trpc } from "~/utils/trpc";
-import { useQueryClient } from "react-query";
-import { RadioGroupAnswer } from "~/components/Form/RadioGroupAnswer";
-import { useCallback, useState } from "react";
-import { ArrowRight, Check, Spinner, VideoCamera, X } from "phosphor-react";
 import { ResultChart } from "~/components/ResultChart";
 
 export function getLevelFromResult(result: number) {
@@ -19,9 +17,6 @@ export function getLevelFromResult(result: number) {
 export default function Report() {
   const router = useRouter();
   const submissionId = String(router.query.id);
-
-  const [isMasterclassBannerMinimized, setIsMasterclassBannerMinimized] =
-    useState(false);
 
   const { data, isLoading } = trpc.useQuery([
     "submissionSession.report",
@@ -44,8 +39,6 @@ export default function Report() {
 
   return (
     <>
-      {/* <NextSeo title={`Relatório: ${report.quiz?.title}`} noindex /> */}
-
       <div className="mx-auto mb-36 flex max-w-2xl flex-col items-stretch justify-center py-6 px-4">
         <div className="flex flex-col items-center justify-center">
           <ResultChart score={report?.result} />
@@ -87,45 +80,6 @@ export default function Report() {
             );
           })}
         </ol>
-
-        {/* <div className="shadow-black fixed left-0 right-0 bottom-0 flex w-full max-w-2xl items-center justify-between gap-8 border border-zinc-700 bg-zinc-800 p-6 text-left shadow-2xl sm:bottom-8 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 sm:gap-16 sm:rounded-lg">
-          <button
-            onClick={() => setIsMasterclassBannerMinimized(true)}
-            className="absolute right-3 top-3 text-zinc-400 hover:text-zinc-200"
-          >
-            <X className="h-4 w-4" />
-          </button>
-
-          <div className="flex-1">
-            <strong className="text-lg leading-relaxed text-zinc-100">
-              Assistir Masterclass de React
-            </strong>
-            <p className="leading-relaxed text-zinc-300">
-              Acelere sua evolução com uma <strong>Masterclass</strong> de 1
-              hora em React e seu ecossistema!
-            </p>
-          </div>
-
-          <div className="flex flex-col items-center gap-3">
-            <button
-              type="button"
-              className="bg-violet-600 hover:bg-violet-700 focus:ring-violet-400 inline-flex items-center justify-center gap-2 rounded-md px-8 py-3 font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-900 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Assistir
-              <ArrowRight />
-            </button>
-          </div>
-        </div> */}
-
-        <button
-          onClick={() => setIsMasterclassBannerMinimized(false)}
-          className="shadow-black fixed right-8 bottom-8 flex items-center justify-center gap-3 rounded-full border border-zinc-700 bg-zinc-800 px-6 py-3 shadow-2xl hover:bg-zinc-700"
-        >
-          <VideoCamera className="h-5 w-5 text-zinc-300" />
-          <strong className="font-medium text-zinc-300">
-            Masterclass de React
-          </strong>
-        </button>
       </div>
     </>
   );
