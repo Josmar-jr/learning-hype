@@ -1,10 +1,6 @@
 import { z } from "zod";
 import { createRouter } from "./context";
 
-const submissionSessionSchema = z.object({
-  submissionId: z.string().cuid(),
-});
-
 export const quizRouter = createRouter()
   .query("getAll", {
     async resolve({ ctx }) {

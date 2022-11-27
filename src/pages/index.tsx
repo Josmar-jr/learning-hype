@@ -1,4 +1,4 @@
-import type { GetServerSideProps } from "next";
+import type { GetStaticProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,6 +12,8 @@ import { trpc } from "~/utils/trpc";
 import { LevelBar } from "~/components/LevelBar";
 
 import hypetiguerLogoImg from "~/assets/logo.svg";
+import { trpcSSG } from "~/server/trpc-ssg";
+import type { Quiz } from "@prisma/client";
 
 const listVariants: Variants = {
   hidden: { opacity: 0, y: 100 },
@@ -83,7 +85,7 @@ export default function Home() {
           animate="visible"
           className="mt-8 w-full"
         >
-          {quizzes?.map((quiz) => (
+          {quizzes?.map((quiz: Quiz) => (
             <motion.li
               key={quiz.id}
               variants={itemVariants}
@@ -138,8 +140,13 @@ export default function Home() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps = async () => {
+  await trpcSSG.prefetchQuery('quiz.getAll')
+
   return {
-    props: {},
-  };
-};
+    props: {
+      trpcState: trpcSSG.dehydrate(),
+    },
+    revalidate: 60 * 60 * 2, // 2 hours
+  }
+}

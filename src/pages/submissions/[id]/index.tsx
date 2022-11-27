@@ -15,7 +15,7 @@ import { RadioGroupAnswer } from "~/components/Form/RadioGroupAnswer";
 
 export default function Quiz() {
   const router = useRouter();
-  const submissionId = String(router.query.id);
+  const submissionId = String(router.query.id) || " ";
   const queryClient = useQueryClient();
 
   const [questionAnswerId, setQuestionAnswerId] = useState("");
@@ -181,7 +181,7 @@ export default function Quiz() {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  const submissionId = params?.id as string;
+  const submissionId = (params?.id as string) || "";
 
   await trpcSSG.prefetchQuery("submissionSession.get", { submissionId });
   await trpcSSG.prefetchQuery("submissionSession.fetchQuestion", {
