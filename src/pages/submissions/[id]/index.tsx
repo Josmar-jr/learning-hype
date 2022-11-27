@@ -1,15 +1,16 @@
-import { Check, Spinner, Timer } from "phosphor-react";
-import * as RadioGroup from "@radix-ui/react-radio-group";
-import type { GetServerSideProps, GetStaticPaths, GetStaticProps } from "next";
-import { trpcSSG } from "~/server/trpc-ssg";
+import { useState, useCallback } from "react";
+import type { FormEvent } from "react";
+import type { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
-import { Countdown } from "~/components/Countdown";
-import { Button } from "~/components/Form/Button";
+import { useQueryClient } from "react-query";
+import { Spinner } from "phosphor-react";
+
+import { trpcSSG } from "~/server/trpc-ssg";
 import type { inferQueryOutput } from "~/utils/trpc";
 import { trpc } from "~/utils/trpc";
-import type { FormEvent } from "react";
-import { useState, useCallback } from "react";
-import { useQueryClient } from "react-query";
+
+import { Button } from "~/components/Form/Button";
+import { Countdown } from "~/components/Countdown";
 import { RadioGroupAnswer } from "~/components/Form/RadioGroupAnswer";
 
 export default function Quiz() {
@@ -62,14 +63,6 @@ export default function Quiz() {
       };
     });
   }, [submissionId, queryClient]);
-
-  if (question?.status === "finished") {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center gap-2 text-lg text-zinc-500">
-        <Button>Quiz já finalizado!</Button>
-      </div>
-    );
-  }
 
   return (
     <div className="h-screen bg-gray-100">
@@ -127,7 +120,9 @@ export default function Quiz() {
             className="mx-auto mt-4 max-w-4xl py-4 px-6"
             onSubmit={handleSendAnswer}
           >
-            <h2 className="text-2xl font-bold">Questão 2</h2>
+            <h2 className="text-2xl font-bold">
+              Questão {question?.currentQuestionNumber}
+            </h2>
             {!isLoadingQuestion ? (
               <p className="mt-4 text-lg leading-8">{question?.description}</p>
             ) : (

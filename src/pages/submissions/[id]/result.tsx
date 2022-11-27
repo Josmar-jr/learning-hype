@@ -1,14 +1,10 @@
 import type { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { signIn, useSession } from "next-auth/react";
-import * as Dialog from "@radix-ui/react-dialog";
 
 import {
   BookOpen,
   FacebookLogo,
-  Fingerprint,
-  GithubLogo,
   InstagramLogo,
   Question,
   TwitterLogo,
@@ -30,76 +26,14 @@ function getLevelFromResult(result: number) {
   return "Novato";
 }
 
-export function DialogCredentials() {
-  function handleSignIn(event: React.FormEvent) {
-    event.preventDefault();
-
-    signIn("github");
-  }
-
-  return (
-    <Dialog.Root>
-      <Dialog.Trigger asChild>
-        <Button variant="secondary" className="mx-auto mt-4 w-full max-w-sm">
-          <BookOpen className="h-5 w-5" />
-          Visualizar relátorio
-        </Button>
-      </Dialog.Trigger>
-
-      <Dialog.Overlay className="fixed inset-0 z-20 bg-[#050206] opacity-70" />
-
-      <Dialog.Content className="fixed top-1/2 left-1/2 z-50 flex h-full w-full max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-lg bg-gray-100 py-6 px-4 text-center md:h-auto">
-        <span className="mb-6 rounded-full bg-gray-200 p-4 text-gray-100">
-          <Fingerprint size={32} weight="bold" />
-        </span>
-
-        <Dialog.Title className="text-2xl font-bold">
-          Entre com o Gihub!
-        </Dialog.Title>
-        <Dialog.Description className="text-zinc-400">
-          <p className="py-2 text-gray-800">
-            Faça login com o Gihub na plataforma para visualizar o seu
-            desempenho
-          </p>
-
-          <ul className="flex list-disc flex-col items-center text-left">
-            <li>Emitir relátorio em formato PDF</li>
-            <li>Receba feedbacks constantes</li>
-            <li>Salvar as questões que respondeu</li>
-            <li>Ter um panorama geral de acertos e erros</li>
-          </ul>
-        </Dialog.Description>
-
-        <form
-          onSubmit={handleSignIn}
-          className="mt-8 flex w-full flex-col justify-center gap-2 sm:flex-row-reverse"
-        >
-          <Button type="submit" className="w-full sm:w-64" variant="secondary">
-            <GithubLogo className="h-5 w-5" />
-            Entrar com Github
-          </Button>
-          <Dialog.Close asChild>
-            <Button className="w-full sm:w-64" variant="outlined">
-              Cancelar
-            </Button>
-          </Dialog.Close>
-        </form>
-      </Dialog.Content>
-    </Dialog.Root>
-  );
-}
-
 export default function Result() {
   const router = useRouter();
   const submissionId = String(router.query.id);
-  const session = useSession();
-  const isAuthenticated = !!session.data;
 
   const response = trpc.useQuery(["submission.result", { submissionId }]);
   const result = response.data!;
 
   const level = getLevelFromResult(result?.result);
-  
 
   return (
     <>
@@ -122,21 +56,17 @@ export default function Result() {
           outros usuários
         </p>
 
-        {isAuthenticated ? (
-          <div className="mt-4 flex flex-col items-center justify-center gap-2 sm:flex-row">
-            <Button className="w-60 flex-1">
-              <Question size={22} weight="fill" />
-              Ver gaparito
-            </Button>
+        <div className="mt-4 flex flex-col items-center justify-center gap-2 sm:flex-row">
+          <Button className="w-60 flex-1">
+            <Question size={22} weight="fill" />
+            Ver gaparito
+          </Button>
 
-            <Button variant="secondary" className="w-60 flex-1">
-              <BookOpen className="h-5 w-5" />
-              Análise completa
-            </Button>
-          </div>
-        ) : (
-          <DialogCredentials />
-        )}
+          <Button variant="secondary" className="w-60 flex-1">
+            <BookOpen className="h-5 w-5" />
+            Análise completa
+          </Button>
+        </div>
 
         <div className="relative my-6 mx-12">
           <div

@@ -11,10 +11,10 @@ datasource db {
   referentialIntegrity = "prisma"
 }
 
-enum CourseLevel {
+enum QuizLevel {
   BEGINNER
-  MIDDLE
-  ADVANCED
+  INTERMEDIATE
+  EXPERT
 }
 
 model Question {
@@ -31,19 +31,6 @@ model Question {
   @@map("questions")
 }
 
-model Trail {
-  id          String      @id @default(cuid())
-  title       String      @db.Text
-  description String      @db.Text
-  imageUrl    String
-  slug        String      @unique
-  difficulty  CourseLevel @default(BEGINNER)
-  price       Int
-  createdAt   DateTime    @default(now())
-
-  quizzes Quiz[]
-}
-
 model Quiz {
   id          String @id @default(cuid())
   title       String @db.Text
@@ -53,9 +40,8 @@ model Quiz {
 
   questions   Question[]
   submissions Submission[]
-
-  trailId String?
-  trail   Trail?  @relation(fields: [trailId], references: [id])
+  level       QuizLevel    @default(BEGINNER)
+  published   Boolean      @default(false)
 }
 
 model Answer {
