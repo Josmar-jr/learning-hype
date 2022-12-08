@@ -6,11 +6,12 @@ import { httpBatchLink } from "@trpc/client/links/httpBatchLink";
 import { loggerLink } from "@trpc/client/links/loggerLink";
 import superjson from "superjson";
 
-import { trpc } from "../utils/trpc";
-import type { AppProps } from "next/app";
-import "../styles/globals.css";
 import { getBaseUrl } from "../utils/get-base-url";
 import type { AppRouter } from "../server/router";
+
+import "../styles/globals.css";
+
+import { ThemeProvider } from "next-themes";
 
 const App: AppType<{ session: Session | null }> = ({
   Component,
@@ -18,7 +19,9 @@ const App: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <SessionProvider session={session}>
-      <Component {...pageProps} />
+      <ThemeProvider enableSystem={true} attribute="class">
+        <Component {...pageProps} />
+      </ThemeProvider>
     </SessionProvider>
   );
 };

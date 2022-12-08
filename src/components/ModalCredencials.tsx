@@ -16,16 +16,16 @@ export function ModalCredentials({ ...props }: ModalCredentialsProps) {
   return (
     <Dialog.Root {...props}>
       <Dialog.Trigger asChild>
-        <Button className="mt-8 w-56">
+        <Button className="mt-8 w-56 group">
           Iniciar quiz
-          <ArrowRight />
+          <ArrowRight className="group-hover:translate-x-2 ease-linear duration-200" />
         </Button>
       </Dialog.Trigger>
 
       <Dialog.Overlay className="fixed inset-0 z-20 bg-[#050206] opacity-70" />
 
-      <Dialog.Content className="fixed top-1/2 left-1/2 z-50 flex h-full w-full max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-lg bg-gray-100 py-6 px-4 text-center md:h-auto">
-        <span className="mb-6 rounded-full bg-gray-300 p-4 text-gray-100">
+      <Dialog.Content className="fixed top-1/2 left-1/2 z-50 flex h-full w-full max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-lg bg-gray-100 py-6 px-4 text-center sm:h-auto">
+        <span className="mb-6 rounded-full bg-zinc-300 p-4 text-gray-100">
           <Fingerprint size={32} weight="bold" />
         </span>
 
@@ -33,17 +33,9 @@ export function ModalCredentials({ ...props }: ModalCredentialsProps) {
           Entre com o Gihub!
         </Dialog.Title>
         <Dialog.Description className="text-zinc-400">
-          <p className="py-2 text-gray-800">
-            Faça login com o Gihub na plataforma para visualizar o seu
-            desempenho
+          <p className="py-2">
+            É preciso efetuar o login com o Github para realizar o quiz!
           </p>
-
-          <ul className="flex list-disc flex-col items-center text-left">
-            <li>Emitir relátorio em formato PDF</li>
-            <li>Receba feedbacks constantes</li>
-            <li>Salvar as questões que respondeu</li>
-            <li>Ter um panorama geral de acertos e erros</li>
-          </ul>
         </Dialog.Description>
 
         <form

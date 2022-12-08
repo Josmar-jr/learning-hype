@@ -70,7 +70,7 @@ export default function Quiz() {
   }, [submissionId, queryClient]);
 
   return (
-    <div className="h-screen bg-gray-100">
+    <div className="h-screen">
       {isFinishingQuiz ? (
         <div className="flex h-screen w-screen items-center justify-center gap-2 text-zinc-400">
           <Spinner className="h-6 w-6 animate-spin" />
@@ -81,7 +81,7 @@ export default function Quiz() {
           <h4 className="sr-only">Status</h4>
 
           <div aria-hidden="true">
-            <div className="overflow-hidden rounded-sm bg-zinc-300">
+            <div className="overflow-hidden rounded-sm bg-zinc-300 dark:bg-zinc-600">
               {question?.quantityQuestions !== undefined && (
                 <div
                   className="h-2 bg-indigo-500"
@@ -97,15 +97,15 @@ export default function Quiz() {
           </div>
 
           <div className="flex items-center justify-between">
-            <p className="text-md p-3 font-medium">
+            <p className="text-md p-3 font-medium dark:text-zinc-300">
               Questão {question?.currentQuestionNumber} de
               {question?.quantityQuestions}
               <span
-                className="hidden text-gray-400 sm:mx-1 sm:inline"
+                className="hidden text-gray-400 dark:text-zinc-300 sm:mx-1 sm:inline"
                 aria-hidden="true"
               >
                 &middot;
-              </span>{" "}
+              </span>
               <strong className="block sm:inline">
                 {submission?.quiz.title}
               </strong>
@@ -127,12 +127,12 @@ export default function Quiz() {
             className="mx-auto mt-4 max-w-4xl py-4 px-6"
             onSubmit={handleSendAnswer}
           >
-            <h2 className="text-2xl font-bold">
+            <h2 className="text-2xl font-bold dark:text-zinc-200">
               Questão {question?.currentQuestionNumber}
             </h2>
             {!isLoadingQuestion ? (
               <p
-                className="mt-4 text-lg leading-8"
+                className="mt-4 text-lg leading-8 dark:text-zinc-200"
                 dangerouslySetInnerHTML={{
                   __html: question?.description || "",
                 }}

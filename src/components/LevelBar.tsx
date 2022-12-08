@@ -14,16 +14,16 @@ export function LevelBar({ level }: DifficultyBarProps) {
           className={`block h-3 w-1 rounded-sm ${
             level === "INTERMEDIATE" || level === "EXPERT"
               ? "bg-indigo-600"
-              : "bg-gray-200"
+              : "bg-gray-300 dark:bg-zinc-800"
           }`}
         />
         <span
           className={`block h-4 w-1 rounded-sm ${
-            level === "EXPERT" ? "bg-indigo-600" : "bg-gray-200"
+            level === "EXPERT" ? "bg-indigo-600" : "bg-gray-300 dark:bg-zinc-700"
           }`}
         />
       </div>
-      <p className="hidden lg:block">
+      <p className="hidden lg:block dark:text-zinc-400 text-sm">
         {level === "BEGINNER" && "Fácil"}
         {level === "INTERMEDIATE" && "Médio"}
         {level === "EXPERT" && "Expert"}

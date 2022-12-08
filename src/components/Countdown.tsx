@@ -9,9 +9,9 @@ interface CountdownProps {
   onCountdownFinish?: () => void;
 }
 
-export function getColorBySecondsRemaining(seconds: number) {
+export function getColorBySecondsRemaining(seconds: number, color: string) {
   if (seconds >= 60) {
-    return colors.gray[800];
+    return color;
   } else if (seconds > 30) {
     return colors.amber[500];
   }
@@ -40,9 +40,9 @@ export function Countdown({
   return (
     <>
       <span
-        className="inline-flex items-center justify-center gap-1 rounded-md py-1 px-2 font-bold text-white"
+        className="inline-flex items-center justify-center gap-1 rounded-md py-1 px-2 font-bold text-white dark:bg-zinc-400"
         style={{
-          color: getColorBySecondsRemaining(secondsLeft ?? 0),
+          color: getColorBySecondsRemaining(secondsLeft ?? 0, colors.zinc[900]),
         }}
       >
         <Timer size={26} className="" />

@@ -20,17 +20,17 @@ export function RadioGroupAnswer({
           value={answer.id}
           className="flex w-full items-center gap-2 rounded-md border border-gray-200 bg-gray-100 px-6 py-4 text-left 
                 transition-colors checked:border-indigo-500 hover:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 
-                focus:ring-offset-gray-100"
+                focus:ring-offset-gray-100 dark:bg-zinc-800 dark:border-zinc-700"
         >
           <div>
-            <div className="h-6 w-6 rounded-full border-2 border-gray-200 bg-white">
+            <div className="h-6 w-6 rounded-full border-2 border-gray-200 bg-white dark:bg-zinc-800 dark:border-zinc-700">
               <RadioGroup.Indicator
                 className="after:content[''] relative flex h-full w-full items-center
-                  justify-center rounded-full border-4 bg-indigo-500 after:absolute after:block after:h-[11px] after:w-[11px]"
+                  justify-center rounded-full border-4 bg-indigo-500 after:absolute after:block after:h-[11px] after:w-[11px] dark:border-zinc-700"
               />
             </div>
           </div>
-          <p className="leading-relaxed text-zinc-800">{answer.description}</p>
+          <p className="leading-relaxed text-zinc-800 dark:text-zinc-200">{answer.description}</p>
         </RadioGroup.Item>
       ))}
     </RadioGroup.Root>
