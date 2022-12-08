@@ -15,6 +15,7 @@ import { trpc } from "~/utils/trpc";
 
 import { Button } from "~/components/Form/Button";
 import { ResultChart } from "~/components/ResultChart";
+import Link from "next/link";
 
 function getLevelFromResult(result: number) {
   if (result >= 200) {
@@ -46,7 +47,7 @@ export default function Result() {
           <ResultChart score={result?.result} />
         </div>
 
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-bold dark:text-gray-100">
           {result?.quizTitle}: <span className="text-indigo-400">{level}</span>
         </h1>
 
@@ -62,9 +63,11 @@ export default function Result() {
             Ver gaparito
           </Button>
 
-          <Button variant="secondary" className="w-60 flex-1">
-            <BookOpen className="h-5 w-5" />
-            Análise completa
+          <Button variant="secondary" className="w-60 flex-1" asChildren>
+            <Link href={`/submissions/${submissionId}/report`}>
+              <BookOpen className="h-5 w-5" />
+              Análise completa
+            </Link>
           </Button>
         </div>
 
@@ -73,10 +76,10 @@ export default function Result() {
             className="absolute inset-0 flex items-center"
             aria-hidden="true"
           >
-            <div className="w-full border-t border-zinc-400" />
+            <div className="w-full border-t border-zinc-400 dark:border-zinc-600" />
           </div>
           <div className="relative flex justify-center">
-            <span className="bg-gray-100 px-4 text-sm font-semibold text-zinc-500">
+            <span className="bg-gray-100 px-4 text-sm font-semibold text-zinc-500 dark:bg-zinc-900 dark:text-zinc-300">
               Compartilhe
             </span>
           </div>

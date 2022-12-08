@@ -44,16 +44,16 @@ export default function Report() {
           <ResultChart score={report?.result} />
         </div>
 
-        <h1 className="text-center text-3xl font-bold">
+        <h1 className="text-center text-3xl font-bold dark:text-gray-100">
           {report?.quiz?.title}:{" "}
           <span className="text-indigo-400">{level}</span>
         </h1>
 
-        <ol className="mt-6 flex flex-col items-stretch divide-y divide-zinc-300">
+        <ol className="mt-6 flex flex-col items-stretch divide-y divide-zinc-700">
           {report?.report?.map((item) => {
             return (
               <li key={item.question.id} className="space-y-2 py-6">
-                <strong className="leading-relaxed">
+                <strong className="leading-relaxed dark:text-zinc-300">
                   {item.question.description}
                 </strong>
                 <p className="flex items-baseline gap-2 leading-relaxed">
@@ -65,7 +65,7 @@ export default function Report() {
                   ) : (
                     <X className="h-4 w-4 translate-y-0.5 text-red-400" />
                   )}
-                  <span className="flex-1">{item.userAnswer?.description}</span>
+                  <span className="flex-1 dark:text-zinc-400">{item.userAnswer?.description}</span>
                 </p>
 
                 {!item.userAnswer?.isRightAnswer && (

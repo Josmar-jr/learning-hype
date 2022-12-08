@@ -3,17 +3,18 @@ import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
 import type { Variants } from "framer-motion";
+import type { Quiz } from "@prisma/client";
 import { motion } from "framer-motion";
-
-import { Check, PenNib } from "phosphor-react";
+import { Check, Moon, PenNib, Sun } from "phosphor-react";
 
 import { trpc } from "~/utils/trpc";
+import { trpcSSG } from "~/server/trpc-ssg";
 
 import { LevelBar } from "~/components/LevelBar";
 
 import hypetiguerLogoImg from "~/assets/logo.svg";
-import { trpcSSG } from "~/server/trpc-ssg";
-import type { Quiz } from "@prisma/client";
+import hypetiguerLogoDarkImg from "~/assets/logodark.svg";
+import { useTheme } from "next-themes";
 
 const listVariants: Variants = {
   hidden: { opacity: 0, y: 100 },
@@ -45,6 +46,10 @@ const itemVariants: Variants = {
 export default function Home() {
   const { data: quizzes } = trpc.useQuery(["quiz.getAll"]);
 
+  const { systemTheme, theme, setTheme } = useTheme();
+
+  const currentTheme = theme === "system" ? systemTheme : theme;
+
   return (
     <>
       <Head>
@@ -53,6 +58,22 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="mx-auto flex h-screen max-w-2xl flex-col py-24 px-2 text-zinc-600 sm:px-8">
+        {currentTheme === "dark" ? (
+          <button
+            className="absolute top-2 right-2 flex h-10 w-10 items-center justify-center"
+            onClick={() => setTheme("light")}
+          >
+            <Moon size={24} weight="fill" />
+          </button>
+        ) : (
+          <button
+            className="absolute top-2 right-2 flex h-10 w-10 items-center justify-center"
+            onClick={() => setTheme("dark")}
+          >
+            <Sun size={24} weight="fill" />
+          </button>
+        )}
+
         <motion.div
           initial={{
             opacity: 0,
@@ -66,9 +87,13 @@ export default function Home() {
           }}
           className="px-2 md:px-0"
         >
-          <Image src={hypetiguerLogoImg} alt="" width={160} />
+          <Image
+            src={currentTheme === "dark" ? hypetiguerLogoDarkImg : hypetiguerLogoImg}
+            alt=""
+            width={160}
+          />
 
-          <h2 className="mt-6 text-xl font-medium">
+          <h2 className="mt-6 text-xl font-medium dark:text-gray-100">
             Qual teste você quer realizar?
           </h2>
 
@@ -76,8 +101,6 @@ export default function Home() {
             Inicie escolhendo um dos testes da lista abaixo
           </p>
         </motion.div>
-
-        <div></div>
 
         <motion.ul
           variants={listVariants}
@@ -89,7 +112,7 @@ export default function Home() {
             <motion.li
               key={quiz.id}
               variants={itemVariants}
-              className="w-full border-t border-zinc-200 text-gray-400 first:border-none"
+              className="w-full border-t border-zinc-200 text-gray-400 first:border-none dark:border-zinc-800"
             >
               <Link
                 href="/quizzes/[slug]"
@@ -104,7 +127,7 @@ export default function Home() {
                   />
 
                   <div className="w-full max-w-[296px]">
-                    <span className="text-lg font-semibold text-gray-800">
+                    <span className="text-lg font-semibold text-zinc-800 dark:text-gray-100">
                       {quiz.title}
                     </span>
                     <div
@@ -141,12 +164,12 @@ export default function Home() {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-  await trpcSSG.prefetchQuery('quiz.getAll')
+  await trpcSSG.prefetchQuery("quiz.getAll");
 
   return {
     props: {
       trpcState: trpcSSG.dehydrate(),
     },
     revalidate: 60 * 60 * 2, // 2 hours
-  }
-}
+  };
+};

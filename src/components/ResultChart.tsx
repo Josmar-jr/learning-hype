@@ -1,3 +1,4 @@
+import { useTheme } from "next-themes";
 import colors from "tailwindcss/colors";
 import { VictoryPie, VictoryLabel } from "victory";
 
@@ -6,11 +7,16 @@ interface ResultChartProps {
 }
 
 export function ResultChart({ score }: ResultChartProps) {
+  const { theme } = useTheme();
+  console.log(theme)
+
   const valueInPercent = (score * 100) / 200;
 
   return (
     <div className="relative">
-      <span className="absolute top-[106px] left-[116px] text-xl font-medium">Resultado</span>
+      <span className="absolute top-[106px] left-[116px] text-xl font-medium dark:text-zinc-100">
+        Resultado
+      </span>
       <svg viewBox="0 0 320 320" width={320} height={320}>
         <VictoryPie
           standalone={false}
@@ -29,7 +35,11 @@ export function ResultChart({ score }: ResultChartProps) {
               fill: ({ datum }) => {
                 const color = colors.emerald[500];
 
-                return datum.x === 1 ? color : colors.gray[200];
+                return datum.x === 1
+                  ? color
+                  : theme === "dark"
+                  ? colors.zinc[700]
+                  : colors.gray[200];
               },
             },
           }}
@@ -42,7 +52,7 @@ export function ResultChart({ score }: ResultChartProps) {
           text={score}
           style={{
             fontSize: 64,
-            fill: colors.gray[900],
+            fill: theme === "dark" ? colors.gray[100] : colors.gray[900],
             fontWeight: "bold",
             fontFamily: "Inter",
           }}
