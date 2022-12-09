@@ -1,5 +1,6 @@
 import type { GetServerSideProps } from "next";
 import Head from "next/head";
+import Link from "next/link";
 import { useRouter } from "next/router";
 
 import {
@@ -15,7 +16,6 @@ import { trpc } from "~/utils/trpc";
 
 import { Button } from "~/components/Form/Button";
 import { ResultChart } from "~/components/ResultChart";
-import Link from "next/link";
 
 function getLevelFromResult(result: number) {
   if (result >= 200) {

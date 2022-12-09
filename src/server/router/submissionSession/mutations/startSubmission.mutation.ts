@@ -8,7 +8,6 @@ import type { ICustomCtx, IInputParams } from "~/types/router-params";
 interface IParams {
   input: IInputParams<{
     quizId: string;
-    userId: string;
   }>;
   ctx: ICustomCtx<{
     session?: Session | null;
@@ -21,9 +20,10 @@ export async function startSubmissionMutation({
 }: IParams): Promise<{
   submissionId: string;
 }> {
-  let { sessionId = null } = parseCookies({ req: ctx.req });
+  console.log(ctx)
+  let { sessionId = null, userId = null } = parseCookies({ req: ctx.req });
 
-  if (!sessionId && !input.userId) {
+  if (!sessionId && !userId) {
     sessionId = randomUUID();
 
     setCookie({ res: ctx.res }, "sessionId", sessionId, {
@@ -36,7 +36,7 @@ export async function startSubmissionMutation({
     data: {
       quizId: input.quizId,
       sessionId,
-      userId: input.userId,
+      userId,
     },
   });
 
