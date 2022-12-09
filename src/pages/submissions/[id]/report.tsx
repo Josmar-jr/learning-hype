@@ -40,7 +40,7 @@ export default function Report() {
 
   return (
     <>
-      <div className="mx-auto mb-28 flex max-w-2xl flex-col items-stretch justify-center py-6 px-4">
+      <div className="mx-auto lg:mb-28 flex max-w-2xl flex-col items-stretch justify-center py-6 px-4">
         <div className="flex flex-col items-center justify-center">
           <ResultChart score={report?.result} />
         </div>
