@@ -1,16 +1,18 @@
+import { useEffect } from "react";
+import type { GetStaticPaths, GetStaticProps } from "next";
+import Image from "next/image";
+import { useRouter } from "next/router";
 import { ArrowRight, ClockAfternoon, ListBullets } from "phosphor-react";
 import { useTheme } from "next-themes";
 import { useSession } from "next-auth/react";
-import type { GetStaticPaths, GetStaticProps } from "next";
 import { trpcSSG } from "~/server/trpc-ssg";
-import { useRouter } from "next/router";
-import Image from "next/image";
 
 import { trpc } from "~/utils/trpc";
 import hypetiguerLogoImg from "~/assets/logo.svg";
 import hypetiguerLogoDarkImg from "~/assets/logodark.svg";
 import { Button } from "~/components/Form/Button";
 import { ModalCredentials } from "~/components/ModalCredencials";
+import { parseCookies } from "nookies";
 
 export default function Quiz() {
   const { theme } = useTheme();
@@ -34,7 +36,10 @@ export default function Quiz() {
       },
     });
 
-  console.log(theme);
+  useEffect(() => {
+    const t = parseCookies();
+    console.log(t);
+  }, []);
 
   return (
     <div className="mx-auto flex h-screen max-w-2xl flex-col items-center py-24 px-8 text-zinc-100">
@@ -44,7 +49,14 @@ export default function Quiz() {
         width={160}
       />
 
-      <Image className="mt-16 w-36" src={quiz.imageUrl} alt="logo" width={144} height={144} quality={100} />
+      <Image
+        className="mt-16 w-36"
+        src={quiz.imageUrl}
+        alt="logo"
+        width={144}
+        height={144}
+        quality={100}
+      />
 
       <h1 className="mt-8 text-center text-2xl font-bold leading-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
         Desafio: {quiz?.title}
@@ -69,7 +81,12 @@ export default function Quiz() {
       {isAuthenticated ? (
         <Button
           className="group mt-8 w-56"
-          onClick={() => startSubmission({ quizId: quiz.id })}
+          onClick={() =>
+            startSubmission({
+              quizId: quiz.id,
+              userId: session.data?.user?.id ?? "",
+            })
+          }
           isLoading={isStartingSubmission}
           autoFocus
         >

@@ -5,12 +5,16 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 import { env } from "../../../env/server.mjs";
 import { prisma } from "../../../server/db/client";
+import { setCookie } from "nookies";
 
 export const authOptions: NextAuthOptions = {
   // Include user.id on session
   callbacks: {
     session({ session, user }) {
-      console.log(session, user);
+      setCookie(undefined, "userId", user.id, {
+        maxAge: 60 * 60 * 24 * 15, // 15 days
+      });
+
       if (session.user) {
         session.user.id = user.id;
       }

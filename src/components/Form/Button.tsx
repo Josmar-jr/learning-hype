@@ -1,5 +1,5 @@
 import { Spinner } from "phosphor-react";
-import type { ButtonHTMLAttributes, ElementType } from "react";
+import type { ButtonHTMLAttributes } from "react";
 import cln from "classnames";
 import { Slot } from "@radix-ui/react-slot";
 
