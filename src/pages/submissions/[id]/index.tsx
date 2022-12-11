@@ -39,8 +39,23 @@ export default function Quiz() {
     },
   });
 
+  const { mutateAsync: giveUp, isLoading: isGivingUp } = trpc.useMutation(
+    "submissionSession.giveUp",
+    {
+      async onSuccess() {
+        await router.push("/");
+      },
+    }
+  );
+
   const { mutateAsync: sendAnswer, isLoading: isSendingAnswer } =
     trpc.useMutation("submissionSession.sendAnswer");
+
+  async function handleGiveUp() {
+    if (confirm("Você realmente deseja desistir desse teste?")) {
+      await giveUp({ submissionId });
+    }
+  }
 
   async function handleSendAnswer(event: FormEvent) {
     event.preventDefault();
@@ -160,7 +175,12 @@ export default function Quiz() {
             )}
 
             <div className="mt-6 grid grid-cols-2 gap-2 md:flex md:flex-row md:justify-end">
-              <Button className="w-56" variant="outlined">
+              <Button
+                onClick={handleGiveUp}
+                disabled={isGivingUp}
+                className="w-56"
+                variant="outlined"
+              >
                 Desistir
               </Button>
 

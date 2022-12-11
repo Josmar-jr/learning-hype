@@ -118,7 +118,7 @@ export const submissionSessionRouter = createRouter()
             },
           },
         },
-      })
+      });
 
       if (!submission?.reportViewedAt) {
         await Promise.all([
@@ -148,13 +148,26 @@ export const submissionSessionRouter = createRouter()
           },
           userAnswer: questionAnswer.answer,
           rightAnswer: questionAnswer.question.answers[0],
-        }
-      })
+        };
+      });
 
       return {
         result: ctx.submission.result,
         quiz: submission?.quiz,
         report,
       };
+    },
+  })
+  .mutation("giveUp", {
+    input: submissionSessionSchema,
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.submission.update({
+        where: {
+          id: input.submissionId,
+        },
+        data: {
+          gaveUpAt: new Date(),
+        },
+      });
     },
   });
