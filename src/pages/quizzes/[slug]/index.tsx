@@ -6,6 +6,7 @@ import { ArrowRight, ClockAfternoon, ListBullets } from "phosphor-react";
 import { useTheme } from "next-themes";
 import { useSession } from "next-auth/react";
 import { trpcSSG } from "~/server/trpc-ssg";
+import { motion } from "framer-motion";
 
 import { trpc } from "~/utils/trpc";
 import hypetiguerLogoImg from "~/assets/logo.svg";
@@ -42,7 +43,20 @@ export default function Quiz() {
   }, []);
 
   return (
-    <div className="mx-auto flex h-screen max-w-2xl flex-col items-center py-24 px-8 text-zinc-100">
+    <motion.div
+      initial={{
+        opacity: 0,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+      }}
+      transition={{
+        duration: 2,
+        ease: "easeOut",
+      }}
+      className="mx-auto flex h-screen max-w-2xl flex-col items-center py-24 px-8 text-zinc-100"
+    >
       <Image
         src={theme === "dark" ? hypetiguerLogoDarkImg : hypetiguerLogoImg}
         alt=""
@@ -96,7 +110,7 @@ export default function Quiz() {
       ) : (
         <ModalCredentials />
       )}
-    </div>
+    </motion.div>
   );
 }
 

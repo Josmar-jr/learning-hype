@@ -2,7 +2,6 @@ import type { GetStaticProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
-import type { Variants } from "framer-motion";
 import type { Quiz } from "@prisma/client";
 import { motion } from "framer-motion";
 import { Check, Moon, PenNib, Sun } from "phosphor-react";
@@ -15,33 +14,7 @@ import { LevelBar } from "~/components/LevelBar";
 import hypetiguerLogoImg from "~/assets/logo.svg";
 import hypetiguerLogoDarkImg from "~/assets/logodark.svg";
 import { useTheme } from "next-themes";
-
-const listVariants: Variants = {
-  hidden: { opacity: 0, y: 100 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      delayChildren: 0.5,
-      staggerChildren: 0.35,
-      type: "keyframes",
-    },
-  },
-};
-
-const itemVariants: Variants = {
-  hidden: {
-    y: -50,
-    opacity: 0,
-  },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      duration: 0.5,
-    },
-  },
-};
+import { itemVariants, listVariants } from "~/utils/animation";
 
 export default function Home() {
   const { data: quizzes } = trpc.useQuery(["quiz.getAll"]);
