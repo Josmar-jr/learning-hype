@@ -1,22 +1,51 @@
-import type { GetStaticProps } from "next";
+import { useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
+import type { GetStaticProps } from "next";
 import type { Quiz } from "@prisma/client";
 import { motion } from "framer-motion";
 import { Check, Moon, PenNib, Sun } from "phosphor-react";
+import { useTheme } from "next-themes";
+import * as RadioGroup from "@radix-ui/react-radio-group";
 
 import { trpc } from "~/utils/trpc";
+import { itemVariants, listVariants } from "~/utils/animation";
 import { trpcSSG } from "~/server/trpc-ssg";
 
 import { LevelBar } from "~/components/LevelBar";
+import { Modal, ModalTrigger, ModalWrapper, ModalX } from "~/components/Modal";
+import { Button } from "~/components/Form/Button";
 
 import hypetiguerLogoImg from "~/assets/logo.svg";
 import hypetiguerLogoDarkImg from "~/assets/logodark.svg";
-import { useTheme } from "next-themes";
-import { itemVariants, listVariants } from "~/utils/animation";
+
+const items = [
+  {
+    value: 1,
+    memoji: "/very-sad.webp",
+  },
+  {
+    value: 2,
+    memoji: "/sad.webp",
+  },
+  {
+    value: 3,
+    memoji: "/ok.webp",
+  },
+  {
+    value: 4,
+    memoji: "/good.webp",
+  },
+  {
+    value: 5,
+    memoji: "/love.webp",
+  },
+];
 
 export default function Home() {
+  const [feedback, setFeedback] = useState("");
+
   const { data: quizzes } = trpc.useQuery(["quiz.getAll"]);
 
   const { systemTheme, theme, setTheme } = useTheme();
@@ -61,7 +90,11 @@ export default function Home() {
           className="px-2 md:px-0"
         >
           <Image
-            src={currentTheme === "dark" ? hypetiguerLogoDarkImg : hypetiguerLogoImg}
+            src={
+              currentTheme === "dark"
+                ? hypetiguerLogoDarkImg
+                : hypetiguerLogoImg
+            }
             alt=""
             width={160}
           />
@@ -131,6 +164,78 @@ export default function Home() {
             </motion.li>
           ))}
         </motion.ul>
+
+        <Modal>
+          <ModalTrigger asChild>
+            <Button>Open</Button>
+          </ModalTrigger>
+
+          <ModalWrapper maintainDimensions>
+            <ModalX />
+
+            <h4 className="mt-4">Dê a sua opinião para nossa melhora</h4>
+
+            <h1 className="my-4 max-w-sm text-2xl font-bold text-gray-800">
+              Como está sendo a sua experiência com o Hypertiguer?
+            </h1>
+
+            <RadioGroup.Root onValueChange={setFeedback}>
+              {items.map((item) => (
+                <RadioGroup.Item
+                  className="relative"
+                  key={item.value}
+                  value={String(item.value)}
+                >
+                  <img
+                    src={item.memoji}
+                    alt="memoji"
+                    className="w-20 opacity-70 brightness-50"
+                  />
+                  <RadioGroup.Indicator className="absolute top-0 left-0 transition-all ">
+                    <motion.img
+                      initial={{
+                        opacity: 0,
+                      }}
+                      animate={{
+                        opacity: 1,
+                      }}
+                      transition={{ duration: 0.1, type: "spring" }}
+                      src={item.memoji}
+                      alt="memoji"
+                      className="w-20 drop-shadow-2xl transition-all"
+                    />
+                  </RadioGroup.Indicator>
+                </RadioGroup.Item>
+              ))}
+            </RadioGroup.Root>
+
+            <span className="mb-5 font-semibold">
+              {feedback === "1" && (
+                <span className="text-red-500 mb-5 font-semibold">Tá péssima!</span>
+              )}
+              {feedback === "2" && (
+                <span className="text-amber-600 mb-5 font-semibold">Nada legal.</span>
+              )}
+              {feedback === "3" && (
+                <span className="text-amber-400 mb-5 font-semibold">Aceitável.</span>
+              )}
+              {feedback === "4" && (
+                <span className="text-emerald-400">Muito boa!</span>
+              )}
+              {feedback === "5" && (
+                <span className="text-emerald-400 mb-5 font-semibold">Realmente incrível!</span>
+              )}
+            </span>
+
+            <hr className="mb-4 w-full border-t border-zinc-300" />
+
+            <span>Quanto mais informações, mais conseguimos evoluir</span>
+
+            <textarea className="border-zinc mt-4 min-h-[120px] w-full resize-none rounded-md border border-zinc-200 bg-gray-200 py-1 px-2 text-sm text-gray-900 shadow-sm outline-none placeholder:text-gray-400 focus:border-indigo-600 disabled:cursor-not-allowed disabled:opacity-50" />
+
+            <Button className="mt-6">Enviar feedback</Button>
+          </ModalWrapper>
+        </Modal>
       </main>
     </>
   );
