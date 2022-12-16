@@ -14,11 +14,15 @@ import { itemVariants, listVariants } from "~/utils/animation";
 import { trpcSSG } from "~/server/trpc-ssg";
 
 import { LevelBar } from "~/components/LevelBar";
-import { Modal, ModalTrigger, ModalWrapper, ModalX } from "~/components/Modal";
+import { Modal, ModalTitle, ModalTrigger, ModalWrapper, ModalX } from "~/components/Modal";
 import { Button } from "~/components/Form/Button";
 
 import hypetiguerLogoImg from "~/assets/logo.svg";
 import hypetiguerLogoDarkImg from "~/assets/logodark.svg";
+import { useSession } from "next-auth/react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const items = [
   {
@@ -43,14 +47,47 @@ const items = [
   },
 ];
 
+const feedbackFormSchema = z.object({
+  additionalInformation: z.string(),
+  scoreFeedback: z.string(),
+});
+
+type FeedbackFormInputs = z.infer<typeof feedbackFormSchema>;
+
 export default function Home() {
-  const [feedback, setFeedback] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting, errors },
+    setValue,
+  } = useForm<FeedbackFormInputs>({
+    resolver: zodResolver(feedbackFormSchema),
+  });
+
+  console.log(setValue("scoreFeedback", "1"));
+
+  const { data: session } = useSession();
 
   const { data: quizzes } = trpc.useQuery(["quiz.getAll"]);
 
   const { systemTheme, theme, setTheme } = useTheme();
 
   const currentTheme = theme === "system" ? systemTheme : theme;
+
+  const { mutateAsync: sendFeedback } = trpc.useMutation([
+    "feedback.sendFeedback",
+  ]);
+
+  async function onSendFeedback(data: FeedbackFormInputs) {
+    console.log(data);
+    if (session?.user) {
+      await sendFeedback({
+        additionalInformation: data.additionalInformation,
+        score: Number(data.scoreFeedback),
+        userId: session.user.id ?? "",
+      });
+    }
+  }
 
   return (
     <>
@@ -173,67 +210,90 @@ export default function Home() {
           <ModalWrapper maintainDimensions>
             <ModalX />
 
-            <h4 className="mt-4">Dê a sua opinião para nossa melhora</h4>
+            <h4 className="mt-4 text-zinc-500">Dê a sua opinião para nossa melhora</h4>
 
-            <h1 className="my-4 max-w-sm text-2xl font-bold text-gray-800">
+            <ModalTitle className="dark:text-zinc-200">
               Como está sendo a sua experiência com o Hypertiguer?
-            </h1>
+            </ModalTitle>
 
-            <RadioGroup.Root onValueChange={setFeedback}>
-              {items.map((item) => (
-                <RadioGroup.Item
-                  className="relative"
-                  key={item.value}
-                  value={String(item.value)}
-                >
-                  <img
-                    src={item.memoji}
-                    alt="memoji"
-                    className="w-20 opacity-70 brightness-50"
-                  />
-                  <RadioGroup.Indicator className="absolute top-0 left-0 transition-all ">
-                    <motion.img
-                      initial={{
-                        opacity: 0,
-                      }}
-                      animate={{
-                        opacity: 1,
-                      }}
-                      transition={{ duration: 0.1, type: "spring" }}
+            <form onSubmit={handleSubmit(onSendFeedback)}>
+              <RadioGroup.Root
+                onValueChange={(scoreFeedbackValue) =>
+                  setValue("scoreFeedback", scoreFeedbackValue)
+                }
+              >
+                {items.map((item) => (
+                  <RadioGroup.Item
+                    className="relative focus:ring-2 focus:ring-indigo-600 outline-none rounded-sm"
+                    key={item.value}
+                    value={String(item.value)}
+                  >
+                    <img
                       src={item.memoji}
                       alt="memoji"
-                      className="w-20 drop-shadow-2xl transition-all"
+                      className="w-20 opacity-70 brightness-50"
                     />
-                  </RadioGroup.Indicator>
-                </RadioGroup.Item>
-              ))}
-            </RadioGroup.Root>
+                    <RadioGroup.Indicator className="absolute top-0 left-0 transition-all ">
+                      <motion.img
+                        initial={{
+                          opacity: 0,
+                        }}
+                        animate={{
+                          opacity: 1,
+                        }}
+                        transition={{ duration: 0.1, type: "spring" }}
+                        src={item.memoji}
+                        alt="memoji"
+                        className="w-20 drop-shadow-2xl transition-all"
+                      />
+                    </RadioGroup.Indicator>
+                  </RadioGroup.Item>
+                ))}
+              </RadioGroup.Root>
 
-            <span className="mb-5 font-semibold">
-              {feedback === "1" && (
-                <span className="text-red-500 mb-5 font-semibold">Tá péssima!</span>
-              )}
-              {feedback === "2" && (
-                <span className="text-amber-600 mb-5 font-semibold">Nada legal.</span>
-              )}
-              {feedback === "3" && (
-                <span className="text-amber-400 mb-5 font-semibold">Aceitável.</span>
-              )}
-              {feedback === "4" && (
-                <span className="text-emerald-400">Muito boa!</span>
-              )}
-              {feedback === "5" && (
-                <span className="text-emerald-400 mb-5 font-semibold">Realmente incrível!</span>
-              )}
-            </span>
+              {/* <span className="mb-5 font-semibold">
+                {watch("scoreFeedback") === "1" && (
+                  <span className="mb-5 font-semibold text-red-500">
+                    Tá péssima!
+                  </span>
+                )}
+                {watch("scoreFeedback") === "2" && (
+                  <span className="mb-5 font-semibold text-amber-600">
+                    Nada legal.
+                  </span>
+                )}
+                {watch("scoreFeedback") === "3" && (
+                  <span className="mb-5 font-semibold text-amber-400">
+                    Aceitável.
+                  </span>
+                )}
+                {watch("scoreFeedback") === "4" && (
+                  <span className="text-emerald-400">Muito boa!</span>
+                )}
+                {watch("scoreFeedback") === "5" && (
+                  <span className="mb-5 font-semibold text-emerald-400">
+                    Realmente incrível!
+                  </span>
+                )}
+              </span> */}
 
-            <hr className="mb-4 w-full border-t border-zinc-300" />
+              <hr className="mb-4 w-full border-t border-zinc-300 dark:border-zinc-700" />
 
-            <span>Quanto mais informações, mais conseguimos evoluir</span>
+              <span className="text-zinc-500">Quanto mais informações, mais conseguimos evoluir</span>
 
-            <textarea className="border-zinc mt-4 min-h-[120px] w-full resize-none rounded-md border border-zinc-200 bg-gray-200 py-1 px-2 text-sm text-gray-900 shadow-sm outline-none placeholder:text-gray-400 focus:border-indigo-600 disabled:cursor-not-allowed disabled:opacity-50" />
+              <textarea
+                {...register("additionalInformation")}
+                className="border-zinc mt-4 min-h-[120px] w-full resize-none rounded-md border dark:text-zinc-300 dark:border-zinc-700 border-zinc-200 dark:bg-zinc-800 bg-gray-200 py-1 px-2 text-sm text-gray-900 shadow-sm outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 disabled:cursor-not-allowed disabled:opacity-50"
+              />
 
-            <Button className="mt-6">Enviar feedback</Button>
+              <Button
+                type="submit"
+                className="mt-6 w-52"
+                isLoading={isSubmitting}
+              >
+                Enviar feedback
+              </Button>
+            </form>
           </ModalWrapper>
         </Modal>
       </main>
