@@ -8,7 +8,6 @@ interface ResultChartProps {
 
 export function ResultChart({ score }: ResultChartProps) {
   const { theme } = useTheme();
-  console.log(theme)
 
   const valueInPercent = (score * 100) / 200;
 
@@ -44,6 +43,7 @@ export function ResultChart({ score }: ResultChartProps) {
             },
           }}
         />
+
         <VictoryLabel
           textAnchor="middle"
           verticalAnchor="middle"

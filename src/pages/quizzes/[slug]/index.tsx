@@ -56,11 +56,6 @@ export default function Quiz() {
     signIn("github");
   }
 
-  useEffect(() => {
-    const t = parseCookies();
-    console.log(t);
-  }, []);
-
   return (
     <motion.div
       initial={{
