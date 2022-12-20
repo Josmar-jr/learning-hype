@@ -64,5 +64,5 @@ export function ModalDescription({ ...props }: ModalDescriptionProps) {
   return <Dialog.Description {...props} className="text-zinc-400 dark:text-zinc-200" />;
 }
 
-export const ModalTrigger = Dialog.DialogTrigger;
 export const ModalClose = Dialog.Close;
+export const ModalTrigger = Dialog.DialogTrigger;

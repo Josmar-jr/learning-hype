@@ -1,8 +1,11 @@
+import { useState } from "react";
 import type { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 import * as RadioGroup from "@radix-ui/react-radio-group";
+import * as Toast from "@radix-ui/react-toast";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -22,12 +25,12 @@ import { Button } from "~/components/Form/Button";
 import { ResultChart } from "~/components/ResultChart";
 import {
   Modal,
+  ModalClose,
   ModalTitle,
   ModalTrigger,
   ModalWrapper,
   ModalX,
 } from "~/components/Modal";
-import { useSession } from "next-auth/react";
 
 const feedbackFormSchema = z.object({
   additionalInformation: z.string(),
@@ -70,6 +73,9 @@ const items = [
 ];
 
 export default function Result() {
+  const [isOpenModalFeedback, setIsOpenModalFeedback] = useState(false);
+  const [isSendFeedback, setIsSendFeedback] = useState(false);
+
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -85,17 +91,27 @@ export default function Result() {
     formState: { isSubmitting },
     setValue,
     watch,
+    reset,
   } = useForm<FeedbackFormInputs>({
     resolver: zodResolver(feedbackFormSchema),
   });
 
   async function onSendFeedback(data: FeedbackFormInputs) {
     if (session?.user) {
-      await sendFeedback({
-        additionalInformation: data.additionalInformation,
-        score: Number(data.scoreFeedback),
-        userId: session.user.id ?? "",
-      });
+      await sendFeedback(
+        {
+          additionalInformation: data.additionalInformation,
+          score: Number(data.scoreFeedback),
+          userId: session.user.id ?? "",
+        },
+        {
+          onSuccess: () => {
+            setIsSendFeedback(true);
+            setIsOpenModalFeedback(false);
+            reset();
+          },
+        }
+      );
     }
   }
 
@@ -125,7 +141,10 @@ export default function Result() {
         </p>
 
         <div className="mt-4 flex flex-col items-center justify-center gap-2 sm:flex-row">
-          <Modal>
+          <Modal
+            open={isOpenModalFeedback}
+            onOpenChange={setIsOpenModalFeedback}
+          >
             <ModalTrigger asChild>
               <Button className="w-60 flex-1">
                 <NotePencil className="h-5 w-5" />
@@ -149,6 +168,7 @@ export default function Result() {
                   onValueChange={(scoreFeedbackValue) =>
                     setValue("scoreFeedback", scoreFeedbackValue)
                   }
+                  value={watch("scoreFeedback")}
                 >
                   {items.map((item) => (
                     <RadioGroup.Item
@@ -215,14 +235,16 @@ export default function Result() {
                   {...register("additionalInformation")}
                   className="border-zinc mt-4 min-h-[120px] w-full resize-none rounded-md border border-zinc-200 bg-gray-200 py-1 px-2 text-sm text-gray-900 shadow-sm outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
                 />
-
+                {/* <ModalClose asChild> */}
                 <Button
                   type="submit"
                   className="mt-6 w-52"
                   isLoading={isSubmitting}
+                  disabled={!watch("scoreFeedback")}
                 >
                   Enviar feedback
                 </Button>
+                {/* </ModalClose> */}
               </form>
             </ModalWrapper>
           </Modal>
@@ -263,6 +285,18 @@ export default function Result() {
             <TwitterLogo className="inline h-6 w-6 hover:text-indigo-500" />
           </a>
         </div>
+
+        <Toast.Provider swipeDirection="up">
+          <Toast.Root
+            className="z-[999] flex items-center gap-2 rounded-md bg-emerald-200 p-4 shadow-lg ring-2 ring-emerald-500"
+            open={isSendFeedback}
+            onOpenChange={setIsSendFeedback}
+          >
+            <Toast.Description>Feedback enviado! Obrigado 🐼</Toast.Description>
+          </Toast.Root>
+
+          <Toast.Viewport className="fixed top-0 right-0 -z-50 m-0 flex w-[340px] max-w-[100vw] flex-col gap-3 p-6 outline-none" />
+        </Toast.Provider>
       </div>
     </>
   );

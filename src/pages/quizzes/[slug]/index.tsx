@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import type { GetStaticPaths, GetStaticProps } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -11,14 +10,14 @@ import {
 } from "phosphor-react";
 import { useTheme } from "next-themes";
 import { signIn, useSession } from "next-auth/react";
-import { trpcSSG } from "~/server/trpc-ssg";
 import { motion } from "framer-motion";
 
 import { trpc } from "~/utils/trpc";
+import { trpcSSG } from "~/server/trpc-ssg";
 import hypetiguerLogoImg from "~/assets/logo.svg";
 import hypetiguerLogoDarkImg from "~/assets/logodark.svg";
+
 import { Button } from "~/components/Form/Button";
-import { parseCookies } from "nookies";
 import {
   Modal,
   ModalClose,
@@ -131,7 +130,7 @@ export default function Quiz() {
           </ModalTrigger>
 
           <ModalWrapper>
-            <span className="mb-6 rounded-full bg-zinc-300 p-4 text-gray-100">
+            <span className="mb-6 rounded-full bg-zinc-300 p-4 text-gray-100 dark:bg-zinc-700 dark:text-zinc-400">
               <Fingerprint size={32} weight="bold" />
             </span>
 
@@ -139,7 +138,7 @@ export default function Quiz() {
               Entre com o Gihub!
             </ModalTitle>
             <ModalDescription>
-              <p className="py-2">
+              <p className="py-2 text-gray-400">
                 É preciso efetuar o login com o Github para realizar o quiz!
               </p>
             </ModalDescription>
