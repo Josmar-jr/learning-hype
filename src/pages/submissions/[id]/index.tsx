@@ -174,18 +174,18 @@ export default function Quiz() {
               />
             )}
 
-            <div className="mt-6 grid grid-cols-2 gap-2 md:flex md:flex-row md:justify-end">
+            <div className="mt-6 grid grid-cols-1 flex-1 gap-4 md:gap-2 md:flex md:flex-row md:justify-end">
               <Button
                 onClick={handleGiveUp}
                 disabled={isGivingUp}
-                className="w-56"
+                className="md:w-56 w-full"
                 variant="outlined"
               >
                 Desistir
               </Button>
 
               <Button
-                className="w-56"
+                className="md:w-56 w-full"
                 type="submit"
                 isLoading={isSendingAnswer}
                 disabled={!questionAnswerId}

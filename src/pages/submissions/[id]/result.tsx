@@ -140,13 +140,13 @@ export default function Result() {
           outros usuários
         </p>
 
-        <div className="mt-4 flex flex-col items-center justify-center gap-2 sm:flex-row">
+        <div className="mt-4 px-6 md:px-0 flex flex-col items-center justify-center gap-4 md:gap-2 sm:flex-row">
           <Modal
             open={isOpenModalFeedback}
             onOpenChange={setIsOpenModalFeedback}
           >
             <ModalTrigger asChild>
-              <Button className="w-60 flex-1">
+              <Button className="w-full md:w-60 flex-1">
                 <NotePencil className="h-5 w-5" />
                 Enviar feedback
               </Button>
@@ -179,7 +179,7 @@ export default function Result() {
                       <img
                         src={item.memoji}
                         alt="memoji"
-                        className="w-20 opacity-70 brightness-50"
+                        className="w-16 md:w-20 opacity-70 brightness-50"
                       />
                       <RadioGroup.Indicator className="absolute top-0 left-0 transition-all ">
                         <motion.img
@@ -192,7 +192,7 @@ export default function Result() {
                           transition={{ duration: 0.1, type: "spring" }}
                           src={item.memoji}
                           alt="memoji"
-                          className="w-20 drop-shadow-2xl transition-all"
+                          className="w-16 md:w-20 drop-shadow-2xl transition-all"
                         />
                       </RadioGroup.Indicator>
                     </RadioGroup.Item>
@@ -238,7 +238,7 @@ export default function Result() {
                 {/* <ModalClose asChild> */}
                 <Button
                   type="submit"
-                  className="mt-6 w-52"
+                  className="mt-6 md:w-52 w-full"
                   isLoading={isSubmitting}
                   disabled={!watch("scoreFeedback")}
                 >
@@ -249,7 +249,7 @@ export default function Result() {
             </ModalWrapper>
           </Modal>
 
-          <Button variant="secondary" className="w-60 flex-1" asChildren>
+          <Button variant="secondary" className="w-full md:w-60 flex-1" asChildren>
             <Link href={`/submissions/${submissionId}/report`}>
               <BookOpen className="h-5 w-5" />
               Análise completa
@@ -257,7 +257,7 @@ export default function Result() {
           </Button>
         </div>
 
-        <div className="relative my-6 mx-12">
+        <div className="relative my-6 mx-6 md:mx-12">
           <div
             className="absolute inset-0 flex items-center"
             aria-hidden="true"

@@ -40,7 +40,7 @@ export function Countdown({
   return (
     <>
       <span
-        className="inline-flex items-center justify-center gap-1 rounded-md py-1 px-2 font-bold text-white dark:bg-zinc-400"
+        className="inline-flex items-center justify-center gap-1 rounded-md py-1 px-2 font-bold text-white dark:bg-zinc-200"
         style={{
           color: getColorBySecondsRemaining(secondsLeft ?? 0, colors.zinc[900]),
         }}

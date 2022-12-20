@@ -31,7 +31,7 @@ export function ModalWrapper({
     <Dialog.Content
       {...props}
       className={cln(
-        `data-[state=open]:animate-openWrapper data-[data-state=closed]:animate-closeWrapper fixed top-1/2 left-1/2 z-50 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center dark:bg-zinc-900 bg-gray-100 py-6 px-12 text-center text-zinc-400 sm:h-auto sm:w-full sm:rounded-lg sm:max-w-[600px]`,
+        `data-[state=open]:animate-openWrapper data-[data-state=closed]:animate-closeWrapper fixed top-1/2 left-1/2 z-50 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center dark:bg-zinc-900 bg-gray-100 py-6 px-4 md:px-12 text-center text-zinc-400 sm:h-auto sm:w-full sm:rounded-lg sm:max-w-[600px]`,
         {
           ["h-screen w-screen rounded-none"]: maintainDimensions,
         }
