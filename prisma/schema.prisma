@@ -85,6 +85,18 @@ model SubmissionQuestionAnswer {
   answer     Answer?    @relation(fields: [answerId], references: [id])
 }
 
+model Feedback {
+  id                    String  @id @default(cuid())
+  userId                String
+  score                 Int
+  additionalInformation String?
+
+  user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
 // Necessary for Next auth
 model Account {
   id                String  @id @default(cuid())
@@ -121,6 +133,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   submissions   Submission[]
+  Feedback      Feedback[]
 }
 
 model VerificationToken {

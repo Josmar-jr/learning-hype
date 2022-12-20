@@ -2,9 +2,15 @@ import { useEffect } from "react";
 import type { GetStaticPaths, GetStaticProps } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { ArrowRight, ClockAfternoon, ListBullets } from "phosphor-react";
+import {
+  ArrowRight,
+  ClockAfternoon,
+  Fingerprint,
+  GithubLogo,
+  ListBullets,
+} from "phosphor-react";
 import { useTheme } from "next-themes";
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { trpcSSG } from "~/server/trpc-ssg";
 import { motion } from "framer-motion";
 
@@ -12,8 +18,15 @@ import { trpc } from "~/utils/trpc";
 import hypetiguerLogoImg from "~/assets/logo.svg";
 import hypetiguerLogoDarkImg from "~/assets/logodark.svg";
 import { Button } from "~/components/Form/Button";
-import { ModalCredentials } from "~/components/ModalCredencials";
 import { parseCookies } from "nookies";
+import {
+  Modal,
+  ModalClose,
+  ModalDescription,
+  ModalTitle,
+  ModalTrigger,
+  ModalWrapper,
+} from "~/components/Modal";
 
 export default function Quiz() {
   const { theme } = useTheme();
@@ -37,10 +50,11 @@ export default function Quiz() {
       },
     });
 
-  useEffect(() => {
-    const t = parseCookies();
-    console.log(t);
-  }, []);
+  function handleSignIn(event: React.FormEvent) {
+    event.preventDefault();
+
+    signIn("github");
+  }
 
   return (
     <motion.div
@@ -108,7 +122,48 @@ export default function Quiz() {
           <ArrowRight className="duration-200 ease-linear group-hover:translate-x-2" />
         </Button>
       ) : (
-        <ModalCredentials />
+        <Modal>
+          <ModalTrigger asChild>
+            <Button className="group mt-8 w-56">
+              Iniciar quiz
+              <ArrowRight className="duration-200 ease-linear group-hover:translate-x-2" />
+            </Button>
+          </ModalTrigger>
+
+          <ModalWrapper>
+            <span className="mb-6 rounded-full bg-zinc-300 p-4 text-gray-100">
+              <Fingerprint size={32} weight="bold" />
+            </span>
+
+            <ModalTitle className="text-2xl font-bold text-gray-900">
+              Entre com o Gihub!
+            </ModalTitle>
+            <ModalDescription>
+              <p className="py-2">
+                É preciso efetuar o login com o Github para realizar o quiz!
+              </p>
+            </ModalDescription>
+
+            <form
+              onSubmit={handleSignIn}
+              className="mt-8 flex w-full flex-col justify-center gap-2 sm:flex-row-reverse"
+            >
+              <Button
+                type="submit"
+                className="w-full sm:w-64"
+                variant="secondary"
+              >
+                <GithubLogo className="h-5 w-5" />
+                Entrar com Github
+              </Button>
+              <ModalClose asChild>
+                <Button className="w-full sm:w-64" variant="outlined">
+                  Cancelar
+                </Button>
+              </ModalClose>
+            </form>
+          </ModalWrapper>
+        </Modal>
       )}
     </motion.div>
   );

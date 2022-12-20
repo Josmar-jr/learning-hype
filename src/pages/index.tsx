@@ -1,20 +1,32 @@
-import type { GetStaticProps } from "next";
+import { useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
+import type { GetStaticProps } from "next";
 import type { Quiz } from "@prisma/client";
 import { motion } from "framer-motion";
 import { Check, Moon, PenNib, Sun } from "phosphor-react";
+import { useTheme } from "next-themes";
+import * as RadioGroup from "@radix-ui/react-radio-group";
 
 import { trpc } from "~/utils/trpc";
+import { itemVariants, listVariants } from "~/utils/animation";
 import { trpcSSG } from "~/server/trpc-ssg";
 
 import { LevelBar } from "~/components/LevelBar";
+import {
+  Modal,
+  ModalTitle,
+  ModalTrigger,
+  ModalWrapper,
+  ModalX,
+} from "~/components/Modal";
+import { Button } from "~/components/Form/Button";
 
 import hypetiguerLogoImg from "~/assets/logo.svg";
 import hypetiguerLogoDarkImg from "~/assets/logodark.svg";
-import { useTheme } from "next-themes";
-import { itemVariants, listVariants } from "~/utils/animation";
+import { useSession } from "next-auth/react";
+import { useForm } from "react-hook-form";
 
 export default function Home() {
   const { data: quizzes } = trpc.useQuery(["quiz.getAll"]);
@@ -61,7 +73,11 @@ export default function Home() {
           className="px-2 md:px-0"
         >
           <Image
-            src={currentTheme === "dark" ? hypetiguerLogoDarkImg : hypetiguerLogoImg}
+            src={
+              currentTheme === "dark"
+                ? hypetiguerLogoDarkImg
+                : hypetiguerLogoImg
+            }
             alt=""
             width={160}
           />

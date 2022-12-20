@@ -20,7 +20,6 @@ export async function startSubmissionMutation({
 }: IParams): Promise<{
   submissionId: string;
 }> {
-  console.log(ctx)
   let { sessionId = null, userId = null } = parseCookies({ req: ctx.req });
 
   if (!sessionId && !userId) {

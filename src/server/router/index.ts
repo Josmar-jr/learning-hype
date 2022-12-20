@@ -1,6 +1,7 @@
 import superjson from "superjson";
 
 import { createRouter } from "./context";
+import { feedbackRouter } from "./feedback";
 import { quizRouter } from "./quiz";
 import { resultRouter } from "./result";
 import { submissionRouter } from "./submission";
@@ -11,6 +12,7 @@ export const appRouter = createRouter()
   .merge("quiz.", quizRouter)
   .merge("submission.", submissionRouter)
   .merge("submissionSession.", submissionSessionRouter)
+  .merge("feedback.", feedbackRouter)
   .merge("submission.", resultRouter);
 
 export type AppRouter = typeof appRouter;
