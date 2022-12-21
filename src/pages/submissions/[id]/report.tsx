@@ -42,19 +42,17 @@ export default function Report() {
   return (
     <>
       <NextSeo
-        title={`Learning Hype - ${report?.quiz?.title}`}
+        title={`${report?.quiz?.title} | Hypetiguer`}
         description="An app made to you exercise your knowledge in the world of technology and better, free!"
         canonical="https://learning-hype.vercel.app"
         openGraph={{
           url: "https://learning-hype.vercel.app",
-          title: `Learning Hype - ${report?.quiz?.title}`,
+          title: `${report?.quiz?.title} | Hypetiguer`,
           description:
             "See your results for have a better understanding of learning",
           images: [
             {
-              url: "https://learning-hype.vercel.app/logo.svg",
-              width: 329,
-              height: 84,
+              url: report?.quiz?.imageUrl ?? "",
               alt: "Learning hype the best app for developers learning new things",
             },
           ],
