@@ -29,8 +29,11 @@ import {
   ModalTrigger,
   ModalWrapper,
 } from "~/components/Modal";
+import { useState } from "react";
 
 export default function Quiz() {
+  const [isOpenSignModal, setIsOpenSignModal] = useState(false);
+
   const { theme } = useTheme();
 
   const router = useRouter();
@@ -52,18 +55,24 @@ export default function Quiz() {
       },
     });
 
-  function handleSignIn(event: React.FormEvent) {
+  async function handleSignIn(event: React.FormEvent) {
     event.preventDefault();
 
-    signIn("github");
-
-    toast.success("Login feito com sucesso!", {
-      style: {
-        borderRadius: "0.5rem",
-        background: theme === "dark" ? colors.zinc[800] : colors.gray[200],
-        color: theme === "dark" ? colors.zinc[200] : colors.zinc[800],
-      },
-    });
+    try {
+      await signIn("github");
+    } catch (err: any) {
+      toast.error(err?.message ?? "Ihhh deu erro :(");
+    } finally {
+      setIsOpenSignModal(false);
+      
+      toast.success("Login feito com sucesso!", {
+        style: {
+          borderRadius: "0.5rem",
+          background: theme === "dark" ? colors.zinc[800] : colors.gray[200],
+          color: theme === "dark" ? colors.zinc[200] : colors.zinc[800],
+        },
+      });
+    }
   }
 
   return (
@@ -151,7 +160,7 @@ export default function Quiz() {
             <ArrowRight className="duration-200 ease-linear group-hover:translate-x-2" />
           </Button>
         ) : (
-          <Modal>
+          <Modal open={isOpenSignModal} onOpenChange={setIsOpenSignModal}>
             <ModalTrigger asChild>
               <Button className="group mt-8 w-56">
                 Iniciar quiz
@@ -185,11 +194,10 @@ export default function Quiz() {
                   <GithubLogo className="h-5 w-5" />
                   Entrar com Github
                 </Button>
-                <ModalClose asChild>
-                  <Button className="w-full sm:w-64" variant="outlined">
-                    Cancelar
-                  </Button>
-                </ModalClose>
+
+                <Button className="w-full sm:w-64" variant="outlined">
+                  Cancelar
+                </Button>
               </form>
             </ModalWrapper>
           </Modal>
