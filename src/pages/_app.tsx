@@ -22,15 +22,19 @@ const App: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <>
-    <Head>
-      <DefaultSeo {...SEO} />
-    </Head>
+      <Head>
+        <DefaultSeo {...SEO} />
+      </Head>
 
-    <SessionProvider session={session}>
-      <ThemeProvider enableSystem={true} defaultTheme="light" attribute="class">
-        <Component {...pageProps} />
-      </ThemeProvider>
-    </SessionProvider>
+      <SessionProvider session={session}>
+        <ThemeProvider
+          enableSystem={true}
+          defaultTheme="light"
+          attribute="class"
+        >
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </SessionProvider>
     </>
   );
 };
