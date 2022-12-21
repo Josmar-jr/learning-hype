@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import { Check, Spinner, X } from "phosphor-react";
+import { NextSeo } from "next-seo";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 
 import { trpc } from "~/utils/trpc";
@@ -40,7 +41,28 @@ export default function Report() {
 
   return (
     <>
-      <div className="mx-auto lg:mb-28 flex max-w-2xl flex-col items-stretch justify-center py-6 px-4">
+      <NextSeo
+        title={`Learning Hype - ${report?.quiz?.title}`}
+        description="An app made to you exercise your knowledge in the world of technology and better, free!"
+        canonical="https://learning-hype.vercel.app"
+        openGraph={{
+          url: "https://learning-hype.vercel.app",
+          title: `Learning Hype - ${report?.quiz?.title}`,
+          description:
+            "See your results for have a better understanding of learning",
+          images: [
+            {
+              url: "https://learning-hype.vercel.app/logo.svg",
+              width: 329,
+              height: 84,
+              alt: "Learning hype the best app for developers learning new things",
+            },
+          ],
+          siteName: "Learning hype",
+        }}
+      />
+
+      <div className="mx-auto flex max-w-2xl flex-col items-stretch justify-center py-6 px-4 lg:mb-28">
         <div className="flex flex-col items-center justify-center">
           <ResultChart score={report?.result} />
         </div>
@@ -54,12 +76,12 @@ export default function Report() {
           type="auto"
           className="mt-6 flex h-[420px] flex-col items-stretch rounded-sm"
         >
-          <ScrollArea.Viewport className="h-full w-full flex flex-col items-stretch rounded-[inherit] pt-2 dark:divide-zinc-700">
+          <ScrollArea.Viewport className="flex h-full w-full flex-col items-stretch rounded-[inherit] pt-2 dark:divide-zinc-700">
             {report?.report?.map((item) => {
               return (
                 <li
                   key={item.question.id}
-                  className="list-none space-y-2 py-6 px-4 border-t border-t-zinc-200 first:pt-0 first:border-none"
+                  className="list-none space-y-2 border-t border-t-zinc-200 py-6 px-4 first:border-none first:pt-0"
                 >
                   <strong className="leading-relaxed dark:text-zinc-300">
                     {item.question.description}
@@ -91,10 +113,10 @@ export default function Report() {
             })}
           </ScrollArea.Viewport>
           <ScrollArea.Scrollbar
-            className="ml-2 flex touch-none select-none bg-gray-300 dark:bg-zinc-800 px-1 rounded-md"
+            className="ml-2 flex touch-none select-none rounded-md bg-gray-300 px-1 dark:bg-zinc-800"
             orientation="vertical"
           >
-            <ScrollArea.Thumb className="h-2 rounded-sm bg-zinc-300 dark:bg-zinc-600 px-[3px]" />
+            <ScrollArea.Thumb className="h-2 rounded-sm bg-zinc-300 px-[3px] dark:bg-zinc-600" />
           </ScrollArea.Scrollbar>
 
           <ScrollArea.Corner className="bg-zinc-600" />
