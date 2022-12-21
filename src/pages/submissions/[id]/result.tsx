@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { GetServerSideProps } from "next";
-import Head from "next/head";
+import { NextSeo } from "next-seo";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
@@ -138,9 +138,26 @@ export default function Result() {
 
   return (
     <>
-      <Head>
-        <title>{`Resultado: ${result?.quizTitle} | Rocketseat`}</title>
-      </Head>
+      <NextSeo
+        title={`Resultado: ${result?.quizTitle} | Hypetiguer`}
+        description="An app made to you exercise your knowledge in the world of technology and better, free!"
+        canonical="https://learning-hype.vercel.app"
+        openGraph={{
+          url: "https://learning-hype.vercel.app",
+          title: `Resultado: ${result?.quizTitle} | Hypetiguer`,
+          description:
+            "See your results for have a better understanding of learning",
+          images: [
+            {
+              url: "https://learning-hype.vercel.app/logo.svg",
+              width: 329,
+              height: 84,
+              alt: "Learning hype the best app for developers learning new things",
+            },
+          ],
+          siteName: "Learning hype",
+        }}
+      />
 
       <div className="mx-auto flex h-screen max-w-lg flex-col items-stretch justify-center py-6 px-4 text-center">
         <div className="flex flex-col items-center justify-center">
