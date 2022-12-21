@@ -13,6 +13,7 @@ import { signIn, useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
 import colors from "tailwindcss/colors";
+import { NextSeo } from "next-seo";
 
 import { trpc } from "~/utils/trpc";
 import { trpcSSG } from "~/server/trpc-ssg";
@@ -66,117 +67,137 @@ export default function Quiz() {
   }
 
   return (
-    <motion.div
-      initial={{
-        opacity: 0,
-      }}
-      animate={{
-        opacity: 1,
-        y: 0,
-      }}
-      transition={{
-        duration: 2,
-        ease: "easeOut",
-      }}
-      className="mx-auto flex h-screen max-w-2xl flex-col items-center py-24 px-8 text-zinc-100"
-    >
-      <Image
-        src={theme === "dark" ? hypetiguerLogoDarkImg : hypetiguerLogoImg}
-        alt=""
-        width={160}
+    <>
+      <NextSeo
+        title={`${data?.title} | Hypetiguer`}
+        description={data?.description}
+        canonical="https://learning-hype.vercel.app"
+        openGraph={{
+          url: "https://learning-hype.vercel.app",
+          title: `${data?.title} | Hypetiguer`,
+          description: data?.description,
+          images: [
+            {
+              url: data?.imageUrl ?? "",
+              alt: data?.description,
+            },
+          ],
+          siteName: "Learning hype",
+        }}
       />
 
-      <Image
-        className="mt-16 w-36"
-        src={quiz.imageUrl}
-        alt="logo"
-        width={144}
-        height={144}
-        quality={100}
-      />
+      <motion.div
+        initial={{
+          opacity: 0,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+        transition={{
+          duration: 2,
+          ease: "easeOut",
+        }}
+        className="mx-auto flex h-screen max-w-2xl flex-col items-center py-24 px-8 text-zinc-100"
+      >
+        <Image
+          src={theme === "dark" ? hypetiguerLogoDarkImg : hypetiguerLogoImg}
+          alt=""
+          width={160}
+        />
 
-      <h1 className="mt-8 text-center text-2xl font-bold leading-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
-        Desafio: {quiz?.title}
-      </h1>
+        <Image
+          className="mt-16 w-36"
+          src={quiz.imageUrl}
+          alt="logo"
+          width={144}
+          height={144}
+          quality={100}
+        />
 
-      <div className="mt-2 flex divide-x divide-gray-400 text-zinc-400">
-        <span className="inline-flex items-center gap-2 px-4 text-sm">
-          <ClockAfternoon />
-          10 - 40min
-        </span>
+        <h1 className="mt-8 text-center text-2xl font-bold leading-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
+          Desafio: {quiz?.title}
+        </h1>
 
-        <span className="inline-flex items-center gap-2 px-4 text-sm">
-          <ListBullets />
-          {quiz?._count?.questions} questões
-        </span>
-      </div>
+        <div className="mt-2 flex divide-x divide-gray-400 text-zinc-400">
+          <span className="inline-flex items-center gap-2 px-4 text-sm">
+            <ClockAfternoon />
+            10 - 40min
+          </span>
 
-      <p className="mt-4 text-center leading-relaxed text-zinc-500 dark:text-zinc-400">
-        {quiz?.description}
-      </p>
+          <span className="inline-flex items-center gap-2 px-4 text-sm">
+            <ListBullets />
+            {quiz?._count?.questions} questões
+          </span>
+        </div>
 
-      {isAuthenticated ? (
-        <Button
-          className="group mt-8 w-56"
-          onClick={() =>
-            startSubmission({
-              quizId: quiz.id,
-              userId: session.data?.user?.id ?? "",
-            })
-          }
-          isLoading={isStartingSubmission}
-          autoFocus
-        >
-          Iniciar quiz
-          <ArrowRight className="duration-200 ease-linear group-hover:translate-x-2" />
-        </Button>
-      ) : (
-        <Modal>
-          <ModalTrigger asChild>
-            <Button className="group mt-8 w-56">
-              Iniciar quiz
-              <ArrowRight className="duration-200 ease-linear group-hover:translate-x-2" />
-            </Button>
-          </ModalTrigger>
+        <p className="mt-4 text-center leading-relaxed text-zinc-500 dark:text-zinc-400">
+          {quiz?.description}
+        </p>
 
-          <ModalWrapper>
-            <span className="mb-6 rounded-full bg-zinc-300 p-4 text-gray-100 dark:bg-zinc-700 dark:text-zinc-400">
-              <Fingerprint size={32} weight="bold" />
-            </span>
-
-            <ModalTitle className="text-2xl font-bold text-gray-900">
-              Entre com o Gihub!
-            </ModalTitle>
-            <ModalDescription>
-              <p className="py-2 text-gray-400">
-                É preciso efetuar o login com o Github para realizar o quiz!
-              </p>
-            </ModalDescription>
-
-            <form
-              onSubmit={handleSignIn}
-              className="mt-8 flex w-full flex-col justify-center gap-2 sm:flex-row-reverse"
-            >
-              <Button
-                type="submit"
-                className="w-full sm:w-64"
-                variant="secondary"
-              >
-                <GithubLogo className="h-5 w-5" />
-                Entrar com Github
+        {isAuthenticated ? (
+          <Button
+            className="group mt-8 w-56"
+            onClick={() =>
+              startSubmission({
+                quizId: quiz.id,
+                userId: session.data?.user?.id ?? "",
+              })
+            }
+            isLoading={isStartingSubmission}
+            autoFocus
+          >
+            Iniciar quiz
+            <ArrowRight className="duration-200 ease-linear group-hover:translate-x-2" />
+          </Button>
+        ) : (
+          <Modal>
+            <ModalTrigger asChild>
+              <Button className="group mt-8 w-56">
+                Iniciar quiz
+                <ArrowRight className="duration-200 ease-linear group-hover:translate-x-2" />
               </Button>
-              <ModalClose asChild>
-                <Button className="w-full sm:w-64" variant="outlined">
-                  Cancelar
-                </Button>
-              </ModalClose>
-            </form>
-          </ModalWrapper>
-        </Modal>
-      )}
+            </ModalTrigger>
 
-      <Toaster />
-    </motion.div>
+            <ModalWrapper>
+              <span className="mb-6 rounded-full bg-zinc-300 p-4 text-gray-100 dark:bg-zinc-700 dark:text-zinc-400">
+                <Fingerprint size={32} weight="bold" />
+              </span>
+
+              <ModalTitle className="text-2xl font-bold text-gray-900">
+                Entre com o Gihub!
+              </ModalTitle>
+              <ModalDescription>
+                <p className="py-2 text-gray-400">
+                  É preciso efetuar o login com o Github para realizar o quiz!
+                </p>
+              </ModalDescription>
+
+              <form
+                onSubmit={handleSignIn}
+                className="mt-8 flex w-full flex-col justify-center gap-2 sm:flex-row-reverse"
+              >
+                <Button
+                  type="submit"
+                  className="w-full sm:w-64"
+                  variant="secondary"
+                >
+                  <GithubLogo className="h-5 w-5" />
+                  Entrar com Github
+                </Button>
+                <ModalClose asChild>
+                  <Button className="w-full sm:w-64" variant="outlined">
+                    Cancelar
+                  </Button>
+                </ModalClose>
+              </form>
+            </ModalWrapper>
+          </Modal>
+        )}
+
+        <Toaster />
+      </motion.div>
+    </>
   );
 }
 
