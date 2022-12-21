@@ -94,7 +94,7 @@ export default function Home() {
               <Link
                 href="/quizzes/[slug]"
                 as={`quizzes/${quiz.slug}`}
-                className="flex w-full items-center justify-start gap-4 rounded-sm py-4 px-2 transition-all hover:opacity-80 focus:opacity-80 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-100"
+                className="flex w-full items-center justify-start gap-4 rounded-sm py-4 px-2 transition-all hover:opacity-80 focus:opacity-80 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-zinc-900 focus:ring-offset-gray-100"
               >
                 <>
                   <img

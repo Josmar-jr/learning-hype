@@ -38,7 +38,7 @@ module.exports = {
             opacity: 0,
             transform: "translate3D(-50%, calc(-50% + 20px), 0) scale(1)",
           },
-        },
+        }
       },
       animation: {
         openWrapper: "contentShow .3s ease-in",
