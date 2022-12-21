@@ -11,6 +11,8 @@ import {
 import { useTheme } from "next-themes";
 import { signIn, useSession } from "next-auth/react";
 import { motion } from "framer-motion";
+import toast, { Toaster } from "react-hot-toast";
+import colors from "tailwindcss/colors";
 
 import { trpc } from "~/utils/trpc";
 import { trpcSSG } from "~/server/trpc-ssg";
@@ -53,6 +55,14 @@ export default function Quiz() {
     event.preventDefault();
 
     signIn("github");
+
+    toast.success("Login feito com sucesso!", {
+      style: {
+        borderRadius: "0.5rem",
+        background: theme === "dark" ? colors.zinc[800] : colors.gray[200],
+        color: theme === "dark" ? colors.zinc[200] : colors.zinc[800],
+      },
+    });
   }
 
   return (
@@ -164,6 +174,8 @@ export default function Quiz() {
           </ModalWrapper>
         </Modal>
       )}
+
+      <Toaster />
     </motion.div>
   );
 }
