@@ -2,6 +2,8 @@ import { type AppType } from "next/app";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { withTRPC } from "@trpc/next";
+import SEO from "../../next-seo.config";
+import { DefaultSeo } from "next-seo";
 import { httpBatchLink } from "@trpc/client/links/httpBatchLink";
 import { loggerLink } from "@trpc/client/links/loggerLink";
 import superjson from "superjson";
@@ -12,17 +14,28 @@ import type { AppRouter } from "../server/router";
 import "../styles/globals.css";
 
 import { ThemeProvider } from "next-themes";
+import Head from "next/head";
 
 const App: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
   return (
-    <SessionProvider session={session}>
-      <ThemeProvider enableSystem={true} attribute="class">
-        <Component {...pageProps} />
-      </ThemeProvider>
-    </SessionProvider>
+    <>
+      <Head>
+        <DefaultSeo {...SEO} />
+      </Head>
+
+      <SessionProvider session={session}>
+        <ThemeProvider
+          enableSystem={true}
+          defaultTheme="light"
+          attribute="class"
+        >
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </SessionProvider>
+    </>
   );
 };
 

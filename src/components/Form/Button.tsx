@@ -9,7 +9,7 @@ const customVariants = {
   secondary:
     "bg-zinc-800 dark:bg-zinc-200 dark:text-zinc-800 text-gray-100 border border-zinc-900 hover:bg-zinc-900 focus:ring-2 focus:ring-zinc-800 dark:focus:ring-zinc-200 focus:ring-offset-2 focus:ring-offset-gray-100 dark:focus:ring-offset-zinc-900",
   outlined:
-    "bg-gray-100 text-zinc-900 border border-zinc-300 hover:bg-zinc-200 focus:ring-2 focus:ring-zinc-300 focus:ring-offset-2 focus:ring-offset-gray-100 dark:focus:ring-offset-zinc-900",
+    "bg-transparent dark:text-gray-200 text-zinc-900 border border-zinc-300 dark:hover:bg-zinc-900 hover:bg-zinc-200 focus:ring-2 focus:ring-zinc-300 focus:ring-offset-2 focus:ring-offset-gray-100 dark:focus:ring-offset-zinc-900",
 } as const;
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {

@@ -1,12 +1,16 @@
+import { useState } from "react";
 import type { GetServerSideProps } from "next";
-import Head from "next/head";
+import { NextSeo } from "next-seo";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 import * as RadioGroup from "@radix-ui/react-radio-group";
+import colors from "tailwindcss/colors";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import toast, { Toaster } from "react-hot-toast";
 import {
   BookOpen,
   FacebookLogo,
@@ -27,7 +31,7 @@ import {
   ModalWrapper,
   ModalX,
 } from "~/components/Modal";
-import { useSession } from "next-auth/react";
+import { useTheme } from "next-themes";
 
 const feedbackFormSchema = z.object({
   additionalInformation: z.string(),
@@ -70,8 +74,12 @@ const items = [
 ];
 
 export default function Result() {
+  const [isOpenModalFeedback, setIsOpenModalFeedback] = useState(false);
+
   const router = useRouter();
   const { data: session } = useSession();
+
+  const { theme } = useTheme();
 
   const submissionId = String(router.query.id);
   const response = trpc.useQuery(["submission.result", { submissionId }]);
@@ -85,17 +93,42 @@ export default function Result() {
     formState: { isSubmitting },
     setValue,
     watch,
+    reset,
   } = useForm<FeedbackFormInputs>({
     resolver: zodResolver(feedbackFormSchema),
   });
 
   async function onSendFeedback(data: FeedbackFormInputs) {
     if (session?.user) {
-      await sendFeedback({
-        additionalInformation: data.additionalInformation,
-        score: Number(data.scoreFeedback),
-        userId: session.user.id ?? "",
-      });
+      const toastStyle = {
+        borderRadius: "0.5rem",
+        background: theme === "dark" ? colors.zinc[800] : colors.gray[200],
+        color: theme === "dark" ? colors.zinc[200] : colors.zinc[800],
+      };
+
+      await sendFeedback(
+        {
+          additionalInformation: data.additionalInformation,
+          score: Number(data.scoreFeedback),
+          userId: session.user.id ?? "",
+        },
+        {
+          onSuccess: () => {
+            setIsOpenModalFeedback(false);
+
+            toast.success("Obrigado pelo seu feedback!", {
+              style: toastStyle,
+            });
+
+            reset();
+          },
+          onError(error) {
+            toast.success(`${error}`, {
+              style: toastStyle,
+            });
+          },
+        }
+      );
     }
   }
 
@@ -105,9 +138,26 @@ export default function Result() {
 
   return (
     <>
-      <Head>
-        <title>{`Resultado: ${result?.quizTitle} | Rocketseat`}</title>
-      </Head>
+      <NextSeo
+        title={`Resultado: ${result?.quizTitle} | Hypetiguer`}
+        description="An app made to you exercise your knowledge in the world of technology and better, free!"
+        canonical="https://learning-hype.vercel.app"
+        openGraph={{
+          url: "https://learning-hype.vercel.app",
+          title: `Resultado: ${result?.quizTitle} | Hypetiguer`,
+          description:
+            "See your results for have a better understanding of learning",
+          images: [
+            {
+              url: "https://learning-hype.vercel.app/logo.svg",
+              width: 329,
+              height: 84,
+              alt: "Learning hype the best app for developers learning new things",
+            },
+          ],
+          siteName: "Learning hype",
+        }}
+      />
 
       <div className="mx-auto flex h-screen max-w-lg flex-col items-stretch justify-center py-6 px-4 text-center">
         <div className="flex flex-col items-center justify-center">
@@ -124,10 +174,13 @@ export default function Result() {
           outros usuários
         </p>
 
-        <div className="mt-4 flex flex-col items-center justify-center gap-2 sm:flex-row">
-          <Modal>
+        <div className="mt-4 flex flex-col items-center justify-center gap-4 px-6 sm:flex-row md:gap-2 md:px-0">
+          <Modal
+            open={isOpenModalFeedback}
+            onOpenChange={setIsOpenModalFeedback}
+          >
             <ModalTrigger asChild>
-              <Button className="w-60 flex-1">
+              <Button className="w-full flex-1 md:w-60">
                 <NotePencil className="h-5 w-5" />
                 Enviar feedback
               </Button>
@@ -149,6 +202,7 @@ export default function Result() {
                   onValueChange={(scoreFeedbackValue) =>
                     setValue("scoreFeedback", scoreFeedbackValue)
                   }
+                  value={watch("scoreFeedback")}
                 >
                   {items.map((item) => (
                     <RadioGroup.Item
@@ -159,7 +213,7 @@ export default function Result() {
                       <img
                         src={item.memoji}
                         alt="memoji"
-                        className="w-20 opacity-70 brightness-50"
+                        className="w-16 opacity-70 brightness-50 md:w-20"
                       />
                       <RadioGroup.Indicator className="absolute top-0 left-0 transition-all ">
                         <motion.img
@@ -172,7 +226,7 @@ export default function Result() {
                           transition={{ duration: 0.1, type: "spring" }}
                           src={item.memoji}
                           alt="memoji"
-                          className="w-20 drop-shadow-2xl transition-all"
+                          className="w-16 drop-shadow-2xl transition-all md:w-20"
                         />
                       </RadioGroup.Indicator>
                     </RadioGroup.Item>
@@ -215,19 +269,25 @@ export default function Result() {
                   {...register("additionalInformation")}
                   className="border-zinc mt-4 min-h-[120px] w-full resize-none rounded-md border border-zinc-200 bg-gray-200 py-1 px-2 text-sm text-gray-900 shadow-sm outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
                 />
-
+                {/* <ModalClose asChild> */}
                 <Button
                   type="submit"
-                  className="mt-6 w-52"
+                  className="mt-6 w-full md:w-52"
                   isLoading={isSubmitting}
+                  disabled={!watch("scoreFeedback")}
                 >
                   Enviar feedback
                 </Button>
+                {/* </ModalClose> */}
               </form>
             </ModalWrapper>
           </Modal>
 
-          <Button variant="secondary" className="w-60 flex-1" asChildren>
+          <Button
+            variant="secondary"
+            className="w-full flex-1 md:w-60"
+            asChildren
+          >
             <Link href={`/submissions/${submissionId}/report`}>
               <BookOpen className="h-5 w-5" />
               Análise completa
@@ -235,7 +295,7 @@ export default function Result() {
           </Button>
         </div>
 
-        <div className="relative my-6 mx-12">
+        <div className="relative my-6 mx-6 md:mx-12">
           <div
             className="absolute inset-0 flex items-center"
             aria-hidden="true"
@@ -263,6 +323,8 @@ export default function Result() {
             <TwitterLogo className="inline h-6 w-6 hover:text-indigo-500" />
           </a>
         </div>
+
+        <Toaster />
       </div>
     </>
   );
